@@ -1,0 +1,7 @@
+name = "imageGenerationWithDiffusionModels"
+uuid = "0e980b57-2d15-48b5-bc5f-38b5886e7801"
+authors = ["Kajetan Andrzejak <andrzejak@campus.tu-berlin.de>", "Eylul Bektur <bektur@campus.tu-berlin.de>", "Maxim Häffner <m.haefner@campus.tu-berlin.de>", "Maria Krzywnicka <maria.krzywnicka@campus.tu-berlin.de>"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.11"
