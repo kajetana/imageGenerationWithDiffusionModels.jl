@@ -5,7 +5,7 @@ using ImageView
 
 filepath = "/Users/maria/Desktop/image_generation.jl/src/SyntheticImages500.mat"
 
-data = imageGenerationWithDiffusionModels.load_digits_data(filepath)  # Explicitly reference the module
+data = imageGenerationWithDiffusionModels.load_digits_data(filepath)  # Explicitly reference the module -
 
 println("Top-level keys in the .mat file:")
 println(keys(data))
