@@ -3,9 +3,10 @@ include("imageGenerationWithDiffusionModels.jl")
 using .imageGenerationWithDiffusionModels
 using ImageView
 
-filepath = "/Users/maria/Desktop/image_generation.jl/src/SyntheticImages500.mat"
+#filepath = "/Users/maria/Desktop/image_generation.jl/src/SyntheticImages500.mat"
+const FILE_PATH = joinpath(@__DIR__, "dataset", "SyntheticImages500.mat")
 
-data = imageGenerationWithDiffusionModels.load_digits_data(filepath)  # Explicitly reference the module -
+data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)  # Explicitly reference the module -
 
 println("Top-level keys in the .mat file:")
 println(keys(data))
