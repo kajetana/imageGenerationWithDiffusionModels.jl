@@ -3,8 +3,7 @@ include("imageGenerationWithDiffusionModels.jl")
 using .imageGenerationWithDiffusionModels
 using ImageView
 
-#filepath = "/Users/maria/Desktop/image_generation.jl/src/SyntheticImages500.mat"
-const FILE_PATH = joinpath(@__DIR__, "dataset", "SyntheticImages500.mat")
+const FILE_PATH = joinpath(@__DIR__, "src/dataset", "SyntheticImages500.mat")
 beta =  LinRange(1e-4, 0.02, 500)  
 ts = 0:50:500                         
 
@@ -24,6 +23,8 @@ if haskey(data, "syntheticImages")
         sleep(1.0)              # wait 1 second so you can see it
         ImageView.close(w["gui"]["window"]) 
         
+        # TODO reverse the order
+        
         #Add noise to the image
         #for each number, plot 11 images from t=0 to t=500 next to each other         
         frames = [imageGenerationWithDiffusionModels.add_noise_to_image(images[:, :, 1, i], t, beta) for t in ts]
@@ -34,4 +35,3 @@ if haskey(data, "syntheticImages")
 else
     println("Field 'syntheticImages' not found.")
 end
-

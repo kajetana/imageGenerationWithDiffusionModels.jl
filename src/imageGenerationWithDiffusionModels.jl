@@ -4,11 +4,21 @@ using MAT
 using Images
 using Random
 
+# TODO default filepath?
+"""
+    load_digits_data(filepath::String)
+
+Loads digits data from a .mat `filepath`.
+
+# Arguments
+- `filepath::String`: 
+...
+"""
 function load_digits_data(filepath::String)
-    matfile = matread(filepath) 
-    return matfile  
+    return matread(filepath)  
 end
 
+# TODO docs @ebektur
 function add_noise_to_image(img, t, β; rng = Random.GLOBAL_RNG)
     if t==0
         return img
@@ -19,5 +29,6 @@ function add_noise_to_image(img, t, β; rng = Random.GLOBAL_RNG)
     return sqrt(α) .* img .+ sqrt(β[t]) .* ε         # noise the image
 end
 
-end
+export load_digits_data, add_noise_to_image
 
+end
