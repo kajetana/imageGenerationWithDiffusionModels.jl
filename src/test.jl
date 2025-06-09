@@ -5,7 +5,7 @@ const FILE_PATH = joinpath(@__DIR__, "dataset", "SyntheticImages500.mat") # "src
 beta =  LinRange(1e-4, 0.02, 500)  #posterior variance
 alphaBar = cumprod(1 .-beta)
 ts = 500:-50:0   #noise step                       
-println(alphaBar)
+
 data = load_digits_data(FILE_PATH)  # Explicitly reference the module 
 
 println("Top-level keys in the .mat file:")
