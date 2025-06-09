@@ -24,9 +24,9 @@ function add_noise_to_image(img, noise_step, posterior_variance; rng = Random.GL
         return img
     end
     
-    sqrtOneMinusBeta = sqrt(1 - posterior_variance[noise_step])                                   
+    sqrtOneMinusalphaBar = sqrt(1 - posterior_variance[noise_step])                                
     z = randn(rng, eltype(img), size(img))          
-    return sqrtOneMinusBeta .* img .+ sqrt(posterior_variance[noise_step]) .* z         # noise the image
+    return sqrt(posterior_variance[noise_step]).* img .+ sqrtOneMinusalphaBar .* z         # noise the image
 end
 
 export load_digits_data, add_noise_to_image

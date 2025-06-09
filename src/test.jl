@@ -3,8 +3,9 @@ using ImageView
 
 const FILE_PATH = joinpath(@__DIR__, "dataset", "SyntheticImages500.mat") # "src/dataset"
 beta =  LinRange(1e-4, 0.02, 500)  #posterior variance
+alphaBar = cumprod(1 .-beta)
 ts = 500:-50:0   #noise step                       
-
+println(alphaBar)
 data = load_digits_data(FILE_PATH)  # Explicitly reference the module 
 
 println("Top-level keys in the .mat file:")
@@ -23,7 +24,7 @@ if haskey(data, "syntheticImages")
                 
         #Add noise to the image
         #for each number, plot 11 images from t=500 to t=0 next to each other         
-        frames = [imageGenerationWithDiffusionModels.add_noise_to_image(images[:, :, 1, i], t, beta) for t in ts]
+        frames = [imageGenerationWithDiffusionModels.add_noise_to_image(images[:, :, 1, i], t, alphaBar) for t in ts]
         w = imshow(hcat(frames...); name = "digit $i  (t = 500 to 0)")
         sleep(2.0)
         ImageView.close(w["gui"]["window"])
