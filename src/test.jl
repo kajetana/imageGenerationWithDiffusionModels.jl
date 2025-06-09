@@ -1,5 +1,5 @@
 using imageGenerationWithDiffusionModels
-#using ImageView
+using ImageView
 
 const FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat") # "src/dataset"
 beta =  LinRange(1e-4, 0.02, 500)  
