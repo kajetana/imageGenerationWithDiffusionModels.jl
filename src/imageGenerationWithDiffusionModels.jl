@@ -18,15 +18,15 @@ function load_digits_data(filepath::String)
     return matread(filepath)  
 end
 
-# TODO docs @ebektur
-function add_noise_to_image(img, t, β; rng = Random.GLOBAL_RNG)
-    if t==0
+# TODO docs 
+function add_noise_to_image(img, noise_step, posterior_variance; rng = Random.GLOBAL_RNG)
+    if noise_step==0
         return img
     end
     
-    α = 1 - β[t]                                     # retain-signal factor matlab: alpha = 1 - beta(t)
-    ε = randn(rng, eltype(img), size(img))           # Gaussian noise matlab: epsilon = randn(rng, size(img), 'like', img)
-    return sqrt(α) .* img .+ sqrt(β[t]) .* ε         # noise the image
+    sqrtOneMinusBeta = sqrt(1 - posterior_variance[noise_step])                                   
+    z = randn(rng, eltype(img), size(img))          
+    return sqrtOneMinusBeta .* img .+ sqrt(posterior_variance[noise_step]) .* z         # noise the image
 end
 
 export load_digits_data, add_noise_to_image
