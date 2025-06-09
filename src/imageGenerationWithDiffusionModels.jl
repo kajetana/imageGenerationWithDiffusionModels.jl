@@ -11,7 +11,7 @@ using Random
 Loads digits data from a .mat `filepath`.
 
 # Arguments
-- `filepath::String`: 
+- `filepath::String`: A filepath to .mat digits data.
 ...
 """
 function load_digits_data(filepath::String)

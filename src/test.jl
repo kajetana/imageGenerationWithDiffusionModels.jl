@@ -1,13 +1,11 @@
-include("imageGenerationWithDiffusionModels.jl")
+using imageGenerationWithDiffusionModels
+#using ImageView
 
-using .imageGenerationWithDiffusionModels
-using ImageView
-
-const FILE_PATH = joinpath(@__DIR__, "src/dataset", "SyntheticImages500.mat")
+const FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat") # "src/dataset"
 beta =  LinRange(1e-4, 0.02, 500)  
 ts = 0:50:500                         
 
-data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)  # Explicitly reference the module -
+data = load_digits_data(FILE_PATH)  # Explicitly reference the module -
 
 println("Top-level keys in the .mat file:")
 println(keys(data))
