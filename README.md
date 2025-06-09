@@ -12,7 +12,7 @@ This Julia package implements a diffusion model to generate images of digits
 
 ## Getting Started
 
-Download `src/test.jl` and `src/dataset/SyntheticImages500.mat` and place them in 1 folder:
+Download `src/test.jl` and `src/dataset/SyntheticImages500.mat` and place them next to each other inside a `folder` of your liking:
 
 ```
 folder/
@@ -20,7 +20,7 @@ folder/
 ├─ test.jl
 ```
 
-Inside your `folder` install the package using the Julia REPL:
+Inside your `folder` install this package using the Julia REPL:
 
 ```
 julia> using Pkg
