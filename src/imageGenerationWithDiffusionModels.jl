@@ -19,14 +19,14 @@ function load_digits_data(filepath::String)
 end
 
 # TODO docs 
-function add_noise_to_image(img, noise_step, posterior_variance; rng = Random.GLOBAL_RNG)
+function add_noise_to_image(img, noise_step, alpha_bar; rng = Random.GLOBAL_RNG)
     if noise_step==0
         return img
     end
     
-    sqrtOneMinusBeta = sqrt(1 - posterior_variance[noise_step])                                   
+    sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                                
     z = randn(rng, eltype(img), size(img))          
-    return sqrtOneMinusBeta .* img .+ sqrt(posterior_variance[noise_step]) .* z         # noise the image
+    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z         # noise the image
 end
 
 export load_digits_data, add_noise_to_image
