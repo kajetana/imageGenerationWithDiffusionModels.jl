@@ -24,7 +24,7 @@ Inside your `folder` install this package using the Julia REPL and its package m
 
 ```
 (@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#first-milestone
+(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
 ```
 
 Run `test.jl` for a quick demo:
