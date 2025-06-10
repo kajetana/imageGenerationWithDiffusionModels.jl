@@ -8,7 +8,7 @@
 
 This Julia package implements a diffusion model to generate images of digits
 
-![](/Screenshot 2025-06-10 at 12.45.06.png)
+![](/Screenshot%202025-06-10%20at%2012.45.06.png)
 
 ## Getting Started
 
