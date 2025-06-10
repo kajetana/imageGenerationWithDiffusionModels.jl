@@ -1,7 +1,7 @@
 using imageGenerationWithDiffusionModels
 using ImageView
 
-const FILE_PATH = joinpath(@__DIR__, "dataset", "SyntheticImages500.mat") # "src/dataset"
+const FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 beta =  LinRange(1e-4, 0.02, 500)  #posterior variance
 alphaBar = cumprod(1 .-beta)
 ts = 500:-50:0 #noise step                      
