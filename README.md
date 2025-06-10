@@ -8,7 +8,7 @@
 
 This Julia package implements a diffusion model to generate images of digits
 
-![](/Screenshot%202025-06-07%20at%2011.48.08.png)
+![](/Screenshot 2025-06-10 at 12.45.06.png)
 
 ## Getting Started
 
@@ -20,11 +20,11 @@ folder/
 ├─ test.jl
 ```
 
-Inside your `folder` install this package using the Julia REPL:
+Inside your `folder` install this package using the Julia REPL and its package manager:
 
 ```
-julia> using Pkg
-julia> Pkg.add(url="https://github.com/kajetana/imageGenerationWithDiffusionModels.jl", rev="ka/FirstMileStone")
+(@v1.11) pkg> activate --temp
+(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#ka/firstMilestone
 ```
 
 Run `test.jl` for a quick demo:
