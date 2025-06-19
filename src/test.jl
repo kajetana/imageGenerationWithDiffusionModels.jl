@@ -1,5 +1,4 @@
-#using imageGenerationWithDiffusionModels
-include("imageGenerationWithDiffusionModels.jl")
+using imageGenerationWithDiffusionModels
 using ImageView
 
 # TODO better comment dividers
@@ -29,7 +28,7 @@ gui = ImageView.imshow(img)
 canvas = gui["gui"]["canvas"]
 
 # display the noising process for the first few images of the dataset
-for i in 1:1
+for i in 1:4
     img = images[:, :, 1, i]
     
     # TODO implement labels to the new displaying technique
