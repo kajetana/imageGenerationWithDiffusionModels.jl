@@ -10,10 +10,12 @@ This Julia package implements a diffusion model to generate images of digits
 
 ![](/Screenshot%202025-06-10%20at%2012.45.06.png)
 
+```
 src/
 ├── blocks.jl               # reusable bricks (no task-specific code)
 ├── feature_encoder_network.jl  # down-sampling “encoder” built from the bricks
 └── unet.jl                 # the top-level model (currently encoder-only)
+```
 
 ## Getting Started
 
