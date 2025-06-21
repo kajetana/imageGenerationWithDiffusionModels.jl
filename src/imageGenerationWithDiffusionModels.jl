@@ -3,6 +3,7 @@ module imageGenerationWithDiffusionModels
 using MAT
 using Images
 using Random
+using Flux
 
 # TODO default filepath?
 """
@@ -64,6 +65,29 @@ function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLO
     return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
 end
 
-export load_digits_data, add_noise_to_image, visualize_noising_of_image
+using Flux
+using Flux.Data: DataLoader
+
+"""
+    preprocess_images(imgs::Array{Float32,4}) -> DataLoader
+
+Normalizes pixel values from `[0,255]` to `[0,1]`, and returns a
+Flux `DataLoader` yielding image batches of size 50.
+
+# Arguments
+- `imgs::Array{Float32,4}`  
+  A 4D array of shape `(H, W, C=1, N)`, with pixel values in `[0,255]`.
+
+# Returns
+- `DataLoader`  
+  A Flux `DataLoader` object yielding batches of images.
+"""
+function preprocess_images(imgs::Array{Float32,4})
+    imgs_normalized = imgs ./ 255f0
+    return DataLoader((imgs_normalized,), batchsize=50, shuffle=true)
+end
+
+
+export load_digits_data, add_noise_to_image, visualize_noising_of_image, preprocess_images
 
 end
