@@ -11,11 +11,11 @@ struct TResBlock
     emb_proj::Dense     # emb_dim → out_channel
 end
 
-function TResBlock(in_ch::Int, out_ch::Int, emb_dim::Int)
+function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
     TResBlock(
-        Conv((3,3), in_ch => out_ch; pad = 1),
-        Conv((3,3), out_ch => out_ch; pad = 1),
-        in_ch == out_ch ? identity : Conv((1,1), in_ch => out_ch),
+        Conv((3,3), channels; pad = 1),
+        Conv((3,3), channels; pad = 1),
+        channels[1] == channels[2] ? identity : Conv((1,1), channels),
         Dense(emb_dim, out_ch)
     )
 end
