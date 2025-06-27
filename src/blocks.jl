@@ -32,7 +32,13 @@ end
 Downsample() = MaxPool((2,2))
 
 # 2x up-sampling helper
-Upsample() = Upsample((2,2))
+function Upsampling(channels::Pair{<:Integer, <:Integer})
+    Chain(
+        Upsample(2,2)
+        Conv((3,3), channels, stride = (1,1), pad = 1)
+    )
+    
+end
 
 # conditional skip connection block https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html
 # skip connection for architectures with more than one Input
@@ -82,5 +88,5 @@ function (c::ConditionalChain)(x, ys...)
     end
     x
 end
-export TResBlock, Downsample, Upsample, ConditionalChain, ConditionalSkipConnection
+export TResBlock, Downsample, Upsampling, ConditionalChain, ConditionalSkipConnection
 end 
