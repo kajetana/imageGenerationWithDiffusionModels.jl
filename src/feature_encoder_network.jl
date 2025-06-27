@@ -1,7 +1,7 @@
 module FeatureEncoderNetwork
 using Flux
 import Flux: gelu
-using ..Blocks: TResBlock, Downsample, ConditionalSkipConnection, Upsampling
+using ..Blocks: TResBlock, Downsample, ConditionalSkipConnection, Upsampling, ConditionalChain
 
 """
 make_down_path(; channels=(64,128,256), emb_dim=128, in_ch=1)
@@ -45,18 +45,18 @@ The skipped layers are defined recursively until the intended level-count of the
 When the break condition is reached, the middle of the Unet is created
 """
 function _add_unet_level(in_out::Vector{Tuple{Int,Int}}, emb_dim::Int, level::Int;
-    block_layer, num_blocks_per_level::Int, block_groups::Int, num_attention_heads::Int
+    block_layer, num_blocks_per_level::Int
 )
     if level > length(in_out) # stop recursion and make the middle
         in_ch, out_ch = in_out[end]
-        keys_ = (Symbol("down_$level"), :middle_1, :middle_attention, :middle_2)
+        keys_ = (Symbol("downsample_$level"), :middle, Symbol("upsample_$level"))
         layers = (
             Downsample(),
-            block_layer(in_ch => 2*in_ch, emb_dim)
-            Upsample(2*in_ch => out_ch)
+            block_layer(in_ch => 2*in_ch, emb_dim),
+            Upsampling(2*in_ch => out_ch)
         )
     else # recurse down a layer
-        in_ch_prev, out_ch_prev = in_out[level-1]
+        #in_ch_prev, out_ch_prev = in_out[level-1]
         in_ch, out_ch = in_out[level]
         down_keys = num_blocks_per_level == 1 ? [Symbol("down_$(level)")] : [Symbol("down_$(level)_$(i)") for i in 1:num_blocks_per_level]
         up_keys = num_blocks_per_level == 1 ? [Symbol("up_$(level)")] : [Symbol("up_$(level)_$(i)") for i in 1:num_blocks_per_level]
@@ -71,7 +71,7 @@ function _add_unet_level(in_out::Vector{Tuple{Int,Int}}, emb_dim::Int, level::In
             block_layer(in_ch => out_ch, emb_dim) for i in 1:num_blocks_per_level
         ]
         up_blocks = [
-            block_layer((out_ch + out_ch) => out_ch, emb_dim; groups=block_groups),
+            block_layer((out_ch + out_ch) => out_ch, emb_dim),
             [block_layer(out_ch => out_ch, emb_dim) for i in 2:num_blocks_per_level]...
         ]
         layers = (
@@ -80,8 +80,6 @@ function _add_unet_level(in_out::Vector{Tuple{Int,Int}}, emb_dim::Int, level::In
             ConditionalSkipConnection(
                 _add_unet_level(in_out, emb_dim, level + 1;
                     block_layer=block_layer,
-                    block_groups=block_groups,
-                    num_attention_heads=num_attention_heads,
                     num_blocks_per_level=num_blocks_per_level
                 ),
                 cat_on_channel_dim
@@ -94,6 +92,6 @@ function _add_unet_level(in_out::Vector{Tuple{Int,Int}}, emb_dim::Int, level::In
 end
 
 
-export make_down_path
+export make_down_path, _add_unet_level, cat_on_channel_dim
 end 
 

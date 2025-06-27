@@ -64,6 +64,15 @@ function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLO
     return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
 end
 
-export load_digits_data, add_noise_to_image, visualize_noising_of_image
+include("embeddings.jl")
+using .Embeddings
+include("blocks.jl")
+using .Blocks
+include("feature_encoder_network.jl")
+using .FeatureEncoderNetwork
+include("unet.jl")
+using .UNet
+
+export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding
 
 end

@@ -16,7 +16,7 @@ function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
         Conv((3,3), channels; pad = 1),
         Conv((3,3), channels; pad = 1),
         channels[1] == channels[2] ? identity : Conv((1,1), channels),
-        Dense(emb_dim, out_ch)
+        Dense(emb_dim, channels[2])
     )
 end
 
@@ -34,7 +34,7 @@ Downsample() = MaxPool((2,2))
 # 2x up-sampling helper
 function Upsampling(channels::Pair{<:Integer, <:Integer})
     Chain(
-        Upsample(2,2)
+        Upsample((2,2)),
         Conv((3,3), channels, stride = (1,1), pad = 1)
     )
     
@@ -42,6 +42,7 @@ end
 
 # conditional skip connection block https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html
 # skip connection for architectures with more than one Input
+abstract type AbstractParallel end
 struct ConditionalSkipConnection{T,F} <: AbstractParallel
     layers::T           #skipped layers
     connection::F       #operation which rejoins output of the skipped layers with input feature maps 
@@ -54,7 +55,7 @@ function (skip::ConditionalSkipConnection)(x, ys...)
 end
 
 #ConditionalChain is basically Flux.Chain but it accepts conditional arguments(like time embeddings)
-abstract type AbstractParallel end
+
 
 
 #dispatch helper
