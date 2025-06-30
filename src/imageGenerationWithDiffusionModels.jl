@@ -31,7 +31,7 @@ Applies Gaussian noise to an image.
 - `rng::Random.TaskLocalRNG`: Random number generator. Defaults to: `Random.GLOBAL_RNG`.
 
 # Returns
-A noised version of image.
+A noised version of image and the applied noise
 """
 function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     if noise_step == 0
@@ -43,8 +43,8 @@ function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     end
     
     sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # TODO        
-    z = randn(rng, eltype(img), size(img))                                        # TODO
-    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z         # noise the image
+    z = randn(rng, eltype(img), size(img))                                        # noise
+    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z, z      # noise the image
 end
 
 """
@@ -76,7 +76,7 @@ using .UNet
 include("cosine_beta_schedule.jl")
 using .Scheduler
 
-export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding
+export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule
 
 
 end

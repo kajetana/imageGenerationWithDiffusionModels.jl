@@ -11,4 +11,6 @@ module Scheduler
 
         return βs
     end
+
+    export cosine_beta_schedule
 end
