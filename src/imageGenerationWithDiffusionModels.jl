@@ -65,8 +65,6 @@ function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLO
     return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
 end
 
-
-=======
 # credits: 
 # https://github.com/LiorSinai/DenoisingDiffusion.jl/blob/main/examples/train_images.jl
 # https://fluxml.ai/Flux.jl/previews/PR1786/data/dataloader/\
