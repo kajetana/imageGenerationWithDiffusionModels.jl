@@ -1,6 +1,4 @@
-include("imageGenerationWithDiffusionModels.jl")
-
-using .imageGenerationWithDiffusionModels
+using imageGenerationWithDiffusionModels
 using ImageView
 
 # TODO better comment dividers
@@ -14,8 +12,6 @@ beta =  LinRange(1e-4, 0.02, 500)  # posterior variance
 alphaBar = cumprod(1 .-beta)
 ts = 500:-50:0 # noising steps
 data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)  # Explicitly reference the module 
-typeof(data)
-data["syntheticImages"]  # Access the synthetic images from the data
 
 ###############################################################################################################
 # displaying the noising process
@@ -32,7 +28,6 @@ gui = ImageView.imshow(img)
 canvas = gui["gui"]["canvas"]
 
 # display the noising process for the first few images of the dataset
-
 for i in 1:4
     img = images[:, :, 1, i]
     
@@ -43,7 +38,5 @@ for i in 1:4
     ImageView.imshow(canvas, img)
     sleep(4.0) 
 end
-
-imageGenerationWithDiffusionModels.preprocess_images(images)
 
 ImageView.close(gui["gui"]["window"])
