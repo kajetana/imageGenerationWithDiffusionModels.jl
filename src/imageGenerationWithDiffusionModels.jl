@@ -65,32 +65,6 @@ function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLO
     return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
 end
 
-
-# credits: 
-# https://github.com/LiorSinai/DenoisingDiffusion.jl/blob/main/examples/train_images.jl
-# https://fluxml.ai/Flux.jl/previews/PR1786/data/dataloader/\
-# https://adrianhill.de/julia-ml-course/L7_Deep_Learning/
-
-"""
-    preprocess_data(data::Matrix{Float32}, batch_size::Int, shuffle::Boolean)
-
-Preprocesses data and returns a Flux object for iteration over "mini-batches" of data for diffusion model training.
-
-# Arguments
-- `data::Matrix{Float32}` : Digit data
-- `batch_size::Int` : Number of training records per batch.  Defaults to: `1`, like Flux's default behaviour
-- `shuffle::Boolean` : Controls wheter to shuffle data. Defaults to: `true`, like Flux's default behaviour
-
-# Returns
-A Flux object for iteration over "mini-batches" of data
-"""
-function preprocess_data(data::Matrix{Float32}, batch_size::Int=1, shuffle::Boolean=true)
-    data = reshape(data, 32, 32, 1, :)
-
-    # no classification
-    return Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
-end
-
 include("embeddings.jl")
 using .Embeddings
 include("blocks.jl")
