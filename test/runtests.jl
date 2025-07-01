@@ -119,9 +119,9 @@ end
         # credits for test type: https://docs.julialang.org/en/v1/stdlib/Test/
         @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)) == Tuple{Matrix{Float64}, Matrix{Float32}}
+        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, 500, alphaBar)) == Matrix{Float64}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)[1]) == (32, 32)
+        @test size(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, 500, alphaBar)) == (32, 32)
     end
 
     @testset "visualize_noising_of_image" begin
