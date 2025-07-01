@@ -14,6 +14,8 @@ const FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
 data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)["syntheticImages"]
 
+# "To make our data compatible with Flux models, we need to add a singleton 
+# color-channel to x to make it compatible with convolutional layers"
 data = reshape(data, 32, 32, 1, :)
 
 ###############################################################################################################
@@ -62,9 +64,12 @@ training_data = Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
 
 # test
 #batch = first(training_data)
+#println(batch)
+#println(batch[1])
 #println(size(batch[1]))
+#println(size(batch[1][:, :, :, :]))
 #println(size(batch[1][:, :, :, 1]))
-#print(typeof(rand(1:num_timesteps, batch_size)))
+# print(typeof(rand(1:num_timesteps, batch_size)))
 
 losses = Float32[]
 
