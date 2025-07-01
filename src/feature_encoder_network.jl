@@ -52,8 +52,8 @@ function _add_unet_level(in_out::Vector{Tuple{Int,Int}}, emb_dim::Int, level::In
         keys_ = (Symbol("downsample_$level"), :middle, Symbol("upsample_$level"))
         layers = (
             Downsample(),
-            block_layer(in_ch => 2*in_ch, emb_dim),
-            Upsampling(2*in_ch => out_ch)
+            block_layer(out_ch => 2*out_ch, emb_dim),
+            Upsampling(2*out_ch => out_ch)
         )
     else # recurse down a layer
         #in_ch_prev, out_ch_prev = in_out[level-1]

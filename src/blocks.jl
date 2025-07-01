@@ -4,7 +4,8 @@ import Flux: gelu
 
 # Resblock: https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html
 # 3×3 → 3×3 Residual block with time conditioning
-struct TResBlock
+abstract type AbstractParallel end
+struct TResBlock<: AbstractParallel
     conv1::Conv         # 3x3
     conv2::Conv         # 3×3
     skip::Any           # identity or 1×1 conv
@@ -21,9 +22,10 @@ function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
 end
 
 function (m::TResBlock)(x, t_emb)
+    @info "Feature shape before failing conv: ", size(x)
     h = gelu.(m.conv1(x))
     # broadcast time embedding to (1,1,C,B) and add
-    h .+= reshape(m.emb_proj(t_emb), 1,1,size(h,3),size(h,4))
+    h = h .+ reshape(m.emb_proj(t_emb), 1,1,size(h,3),size(h,4))
     h  = gelu.(m.conv2(h))
     return h .+ (m.skip === identity ? x : m.skip(x))
 end
@@ -42,7 +44,7 @@ end
 
 # conditional skip connection block https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html
 # skip connection for architectures with more than one Input
-abstract type AbstractParallel end
+
 struct ConditionalSkipConnection{T,F} <: AbstractParallel
     layers::T           #skipped layers
     connection::F       #operation which rejoins output of the skipped layers with input feature maps 

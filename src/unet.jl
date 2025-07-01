@@ -46,7 +46,6 @@ function unet(
     )
     channels = [model_dim * 2^i for i in 0:num_levels-1]
     in_out = collect(zip(channels[1:end-1], channels[2:end]))
-    emb_dim = model_dim*4
     in_ch, out_ch = in_out[1]
 
     chain = ConditionalChain(
@@ -57,7 +56,7 @@ function unet(
             cat_on_channel_dim
         ),
         up_1 = block_layer((out_ch+out_ch)=>in_ch, emb_dim),
-        final = Conv((3,3), in_ch => in_channels)
+        final = Conv((3,3), in_ch => in_channels, pad = (1,1))
     )
     unet(time_embed, chain, num_levels)
 end
