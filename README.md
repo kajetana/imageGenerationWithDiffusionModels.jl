@@ -25,7 +25,7 @@ Inside your `folder` install this package using the Julia REPL and its package m
 
 ```
 (@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
+(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#encoder
 ```
 
 Download [test.jl](src/test.jl), [train.jl](src/train.jl) and [SyntheticImages500.mat](src/SyntheticImages500.mat) and place them next to each other inside a `folder` of your liking:
