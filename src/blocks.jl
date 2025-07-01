@@ -22,7 +22,7 @@ function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
 end
 
 function (m::TResBlock)(x, t_emb)
-    @info "Feature shape before failing conv: ", size(x)
+    #@info "Feature shape before failing conv: ", size(x)
     h = gelu.(m.conv1(x))
     # broadcast time embedding to (1,1,C,B) and add
     h = h .+ reshape(m.emb_proj(t_emb), 1,1,size(h,3),size(h,4))

@@ -1,4 +1,4 @@
-using imageGenerationWithDiffusionModels
+#using imageGenerationWithDiffusionModels
 using Test
 using Flux             
 import Flux: gradient
@@ -7,7 +7,8 @@ const SRC = joinpath(@__DIR__, "..", "src")
 include(joinpath(SRC, "blocks.jl"))                   # module Blocks
 include(joinpath(SRC, "embeddings.jl"))               # module Embeddings
 include(joinpath(SRC, "feature_encoder_network.jl"))  # make_down_path
-include(joinpath(SRC, "unet.jl"))                      # make_unet
+include(joinpath(SRC, "unet.jl"))                     # make_unet
+include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
 
 using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet
 #TODO: Write test set for unet.jl
@@ -118,9 +119,9 @@ end
         # credits for test type: https://docs.julialang.org/en/v1/stdlib/Test/
         @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)) == Matrix{Float64}
+        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)) == Tuple{Matrix{Float64}, Matrix{Float32}}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)) == (32, 32)
+        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)[1]) == (32, 32)
     end
 
     @testset "visualize_noising_of_image" begin

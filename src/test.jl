@@ -1,7 +1,5 @@
-using .imageGenerationWithDiffusionModels
+#using imageGenerationWithDiffusionModels
 using ImageView
-
-# TODO better comment dividers
 
 ###############################################################################################################
 # noising variables
@@ -40,25 +38,3 @@ for i in 1:4
 end
 
 ImageView.close(gui["gui"]["window"])
-
-
-T = 500
-betas, alphas, alpha_bar = imageGenerationWithDiffusionModels.get_schedule(T)
-
-###############################################################################################################
-# Reverse sampling: generating new images
-###############################################################################################################
-# 1. Load or define your model (UNet from your module)
-# model = imageGenerationWithDiffusionModels.unet(in_channels=1, out_channels=1, ch=32, emb_dim=32, ch_mult=[1,2], num_res_blocks=1)
-
-# 2. Reverse sample
-# samples = ReverseSampling.reverse_sample(model, (32, 32, 1, 8); T=T, betas=betas, embedding_fn=embedding_fn)
-
-# 3. Postprocess samples to 2D images and visualize
-# samples = reshape(samples, 32, 32, 8)  # drop channel dim
-# img = hcat([samples[:, :, i] for i in 1:8]...)
-# ImageView.imshow(canvas, img)
-# sleep(6.0)
-# ImageView.close(gui["gui"]["window"])
-
-

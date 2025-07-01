@@ -16,7 +16,8 @@ include("cosine_beta_schedule.jl")
 using .Scheduler
 include("reverse_sampling.jl")
 using .ReverseSampling
-# TODO default filepath?
+
+# TODO default filepath? return ["syntheticImages"]
 """
     load_digits_data(filepath::String)
 
@@ -73,10 +74,8 @@ Visualizes the Gaussian noising process of an image.
 An image visualizing the Gaussian noising process of an image horizontally.
 """
 function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
-    return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
+    return hcat([(imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng)) for t in noise_step]...)
 end
-
-
 
 export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule
 

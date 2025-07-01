@@ -17,6 +17,7 @@ data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)["synthetic
 # "To make our data compatible with Flux models, we need to add a singleton 
 # color-channel to x to make it compatible with convolutional layers"
 data = reshape(data, 32, 32, 1, :)
+#print(typeof(data))
 
 ###############################################################################################################
 # creating the model
@@ -25,6 +26,16 @@ data = reshape(data, 32, 32, 1, :)
 # https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#forward-diffusion
 ###############################################################################################################
 
+# in_channels::Int,
+# num_levels::Int,
+# model_dim::Int,
+# time_embed,
+# emb_dim::Int;
+# block_layer=TResBlock,
+# num_blocks_per_level::Int=1
+
+#in_channels = size(data, 3)
+
 model = imageGenerationWithDiffusionModels.unet(
     1,
     4,
@@ -32,8 +43,6 @@ model = imageGenerationWithDiffusionModels.unet(
     imageGenerationWithDiffusionModels.LearnedTEmbedding(128),
     128;
     num_blocks_per_level=1)
-
-###
 
 ###############################################################################################################
 # training the model
@@ -47,7 +56,7 @@ model = imageGenerationWithDiffusionModels.unet(
 
 # training variables
 learning_rate = 0.001
-epochs = 10
+epochs = 5
 batch_size = 32
 shuffle = true
 
@@ -63,16 +72,19 @@ optimizer = Flux.setup(Adam(learning_rate), model)
 training_data = Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
 
 # test
-#batch = first(training_data)
+batch = first(training_data)
 #println(batch)
 #println(batch[1])
-#println(size(batch[1]))
+#println(typeof(batch[1]))
+# println(size(batch[1]))
+# println(size(batch[1], 4))
 #println(size(batch[1][:, :, :, :]))
 #println(size(batch[1][:, :, :, 1]))
 # print(typeof(rand(1:num_timesteps, batch_size)))
 
 losses = Float32[]
 
+println("Training...")
 for epoch in 1:epochs
     for batch in training_data
         batch = batch[1]
@@ -80,10 +92,10 @@ for epoch in 1:epochs
         imgs = similar(batch)
         noise = similar(batch)
 
-        timesteps = rand(1:num_timesteps, batch_size)
+        timesteps = rand(1:num_timesteps, size(batch, 4))
 
         # iterate over the images in batch and apply noise
-        for i in 1:batch_size
+        for i in 1:size(batch, 4)
             imgs[:, :, :, i], noise[:, :, :, i] = imageGenerationWithDiffusionModels.add_noise_to_image(batch[:, :, :, i], timesteps[i], alphaBar)
         end
 
@@ -94,3 +106,5 @@ for epoch in 1:epochs
         push!(losses, loss)
     end
 end
+
+println("Training finshed!")
