@@ -4,7 +4,18 @@ using MAT
 using Images
 using Random
 using Flux
-
+include("embeddings.jl")
+using .Embeddings
+include("blocks.jl")
+using .Blocks
+include("feature_encoder_network.jl")
+using .FeatureEncoderNetwork
+include("unet.jl")
+using .UNet
+include("cosine_beta_schedule.jl")
+using .Scheduler
+include("reverse_sampling.jl")
+using .ReverseSampling
 # TODO default filepath?
 """
     load_digits_data(filepath::String)
@@ -65,18 +76,7 @@ function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLO
     return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
 end
 
-include("embeddings.jl")
-using .Embeddings
-include("blocks.jl")
-using .Blocks
-include("feature_encoder_network.jl")
-using .FeatureEncoderNetwork
-include("unet.jl")
-using .UNet
-include("cosine_beta_schedule.jl")
-using .Scheduler
-include("reverse_sampling.jl")
-using .ReverseSampling
+
 
 export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule
 
