@@ -10,25 +10,53 @@ This Julia package implements a diffusion model to generate images of digits
 
 ![](/Screenshot%202025-06-10%20at%2012.45.06.png)
 
+```
+TODO
+
+src/
+├── blocks.jl               # reusable bricks (no task-specific code)
+├── feature_encoder_network.jl  # down-sampling “encoder” built from the bricks
+└── unet.jl                 # the top-level model (currently encoder-only)
+```
+
 ## Getting Started
-
-Download [test.jl](src/test.jl) and [SyntheticImages500.mat](src/SyntheticImages500.mat) and place them next to each other inside a `folder` of your liking:
-
-```
-folder/
-├─ SyntheticImages500.mat
-├─ test.jl
-```
 
 Inside your `folder` install this package using the Julia REPL and its package manager:
 
 ```
 (@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
+(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#encoder
 ```
 
-Run `test.jl` for a quick demo:
+Download [test.jl](src/test.jl), [train.jl](src/train.jl) and [SyntheticImages500.mat](src/SyntheticImages500.mat) and place them next to each other inside a `folder` of your liking:
+
+```
+folder/
+├─ SyntheticImages500.mat
+├─ test.jl
+├─ train.jl
+```
+
+### Visualizing the Noising Process
+
+Run `test.jl` for a quick demo of the noising is applied to images:
 
 ```
 julia> include("test.jl")
 ```
+
+### Training
+
+Run `train.jl` to train the diffusion model
+
+```
+julia> include("train.jl")
+```
+
+## References
+
+"Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
+
+DDPM Git Repository by ytdeepia (https://github.com/ytdeepia/DDPM/blob/main/src/training.py)
+
+TODO

@@ -3,21 +3,8 @@ module imageGenerationWithDiffusionModels
 using MAT
 using Images
 using Random
-using Flux
-include("embeddings.jl")
-using .Embeddings
-include("blocks.jl")
-using .Blocks
-include("feature_encoder_network.jl")
-using .FeatureEncoderNetwork
-include("unet.jl")
-using .UNet
-include("cosine_beta_schedule.jl")
-using .Scheduler
-include("reverse_sampling.jl")
-using .ReverseSampling
 
-# TODO default filepath? return ["syntheticImages"]
+# TODO default filepath?
 """
     load_digits_data(filepath::String)
 
@@ -43,7 +30,7 @@ Applies Gaussian noise to an image.
 - `rng::Random.TaskLocalRNG`: Random number generator. Defaults to: `Random.GLOBAL_RNG`.
 
 # Returns
-A noised version of image and the applied noise
+A noised version of image.
 """
 function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     if noise_step == 0
@@ -55,23 +42,8 @@ function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     end
     
     sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # TODO        
-    z = randn(rng, eltype(img), size(img))                                        # noise
-    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z, z      # noise the image
-end
-
-# TODO
-function add_noise_to_image_old(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
-    if noise_step == 0
-        return img
-    end
-
-    if noise_step > length(alpha_bar)
-        error()
-    end
-    
-    sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # TODO        
-    z = randn(rng, eltype(img), size(img))                                        # noise
-    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z      # noise the image
+    z = randn(rng, eltype(img), size(img))                                        # TODO
+    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z         # noise the image
 end
 
 """
@@ -89,9 +61,9 @@ Visualizes the Gaussian noising process of an image.
 An image visualizing the Gaussian noising process of an image horizontally.
 """
 function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
-    return hcat([(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, t, alpha_bar, rng)) for t in noise_step]...)
+    return hcat([imageGenerationWithDiffusionModels.add_noise_to_image(img, t, alpha_bar, rng) for t in noise_step]...)
 end
 
-export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule
+export load_digits_data, add_noise_to_image, visualize_noising_of_image
 
 end

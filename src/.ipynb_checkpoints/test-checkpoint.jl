@@ -1,6 +1,7 @@
-#using imageGenerationWithDiffusionModels
-include("imageGenerationWithDiffusionModels.jl")
+using imageGenerationWithDiffusionModels
 using ImageView
+
+# TODO better comment dividers
 
 ###############################################################################################################
 # noising variables
