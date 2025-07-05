@@ -1,7 +1,10 @@
 include("imageGenerationWithDiffusionModels.jl")
 using .imageGenerationWithDiffusionModels
+include("reverse_sampling.jl")
 
 using Flux
+using ImageView
+using BSON: @save, @load
 
 ###############################################################################################################
 # loading and preprocessing data
@@ -82,29 +85,57 @@ batch = first(training_data)
 #println(size(batch[1][:, :, :, 1]))
 # print(typeof(rand(1:num_timesteps, batch_size)))
 
-losses = Float32[]
+training = false
 
-println("Training...")
-for epoch in 1:epochs
-    for batch in training_data
-        batch = batch[1]
+if training
+    losses = Float32[]
 
-        imgs = similar(batch)
-        noise = similar(batch)
+    println("Training...")
+    for epoch in 1:epochs
+        for batch in training_data
+            batch = batch[1]
 
-        timesteps = rand(1:num_timesteps, size(batch, 4))
+            imgs = similar(batch)
+            noise = similar(batch)
 
-        # iterate over the images in batch and apply noise
-        for i in 1:size(batch, 4)
-            imgs[:, :, :, i], noise[:, :, :, i] = imageGenerationWithDiffusionModels.add_noise_to_image(batch[:, :, :, i], timesteps[i], alphaBar)
+            timesteps = rand(1:num_timesteps, size(batch, 4))
+
+            # iterate over the images in batch and apply noise
+            for i in 1:size(batch, 4)
+                imgs[:, :, :, i], noise[:, :, :, i] = imageGenerationWithDiffusionModels.add_noise_to_image(batch[:, :, :, i], timesteps[i], alphaBar)
+            end
+
+            loss, grads = Flux.withgradient(m -> Flux.mse(model(imgs, timesteps), noise), model)
+
+            Flux.update!(optimizer, model, grads[1])
+
+            push!(losses, loss)
         end
-
-        loss, grads = Flux.withgradient(m -> Flux.mse(model(imgs, timesteps), noise), model)
-
-        Flux.update!(optimizer, model, grads[1])
-
-        push!(losses, loss)
     end
+
+    println("Training finshed!")
+
+    # credits for saving/loading the mode
+    # https://stackoverflow.com/questions/68335891/how-to-load-a-trained-model-with-bson-in-flux-jl
+
+    @save "model.bson" model
 end
 
-println("Training finshed!")
+###############################################################################################################
+# reverse samlping
+##############################################################################################################
+
+@load "model.bson" model
+
+x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=num_timesteps, alpha_hats=alphaBar)
+
+print(x)
+
+img = rand(32,32)
+gui = ImageView.imshow(img)
+canvas = gui["gui"]["canvas"]
+
+ImageView.imshow(canvas, x)
+sleep(8.0) 
+
+ImageView.close(gui["gui"]["window"])
