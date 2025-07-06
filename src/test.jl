@@ -29,9 +29,6 @@ canvas = gui["gui"]["canvas"]
 # display the noising process for the first few images of the dataset
 for i in 1:4
     img = images[:, :, 1, i]
-    
-    # TODO implement labels to the new displaying technique
-    # w = imshow(hcat(frames...); name = "digit $i  (t = 500 to 0)")
 
     img = imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)
     ImageView.imshow(canvas, img)

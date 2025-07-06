@@ -59,7 +59,24 @@ function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z, z      # noise the image
 end
 
-# TODO
+###############################################################################################################
+# Visualization
+###############################################################################################################
+
+"""
+    add_noise_to_image_old(img::Vector{Float64}, noise_step::Int64, alpha_bar::Vector{Float64}; rng = Random.GLOBAL_RNG)
+
+Applies Gaussian noise to an image.
+
+# Arguments
+- `img::Matrix{Float32}` : Input image
+- `noise_step::Int64` : A noising step
+- `alpha_bar::Vector{Float64}` : Vector of noise parameters. Length must be at least "noise_step". Comupted by taking the Cumulative product of (1-"variance schedule")
+- `rng::Random.TaskLocalRNG`: Random number generator. Defaults to: `Random.GLOBAL_RNG`.
+
+# Returns
+A noised version of image
+"""
 function add_noise_to_image_old(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     if noise_step == 0
         return img
@@ -71,7 +88,7 @@ function add_noise_to_image_old(img, noise_step, alpha_bar, rng = Random.GLOBAL_
     
     sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # TODO        
     z = randn(rng, eltype(img), size(img))                                        # noise
-    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z      # noise the image
+    return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z         # noise the image
 end
 
 """
@@ -91,6 +108,10 @@ An image visualizing the Gaussian noising process of an image horizontally.
 function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     return hcat([(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, t, alpha_bar, rng)) for t in noise_step]...)
 end
+
+###############################################################################################################
+# Exports
+###############################################################################################################
 
 export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule
 

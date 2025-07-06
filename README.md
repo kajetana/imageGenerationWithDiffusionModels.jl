@@ -2,6 +2,7 @@
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://kajetana.github.io/imageGenerationWithDiffusionModels.jl/dev/)
 [![Build Status](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/kajetana/imageGenerationWithDiffusionModels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/kajetana/imageGenerationWithDiffusionModels.jl)
 
 > [!WARNING]
 > This project is currently under development
@@ -10,48 +11,26 @@ This Julia package implements a diffusion model to generate images of digits
 
 ![](/Screenshot%202025-06-10%20at%2012.45.06.png)
 
-```
-TODO
+The source code is structured as follows
 
+```
 src/
-├── blocks.jl               # reusable bricks (no task-specific code)
-├── feature_encoder_network.jl  # down-sampling “encoder” built from the bricks
-└── unet.jl                 # the top-level model (currently encoder-only)
+├── blocks.jl                                   reusable bricks (no task-specific code)
+├── cosine_beta_schedule.jl
+├── embeddings.jl
+├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
+├── imageGenerationWithDiffusionModels.jl
+├── model.bson                                  pre-trained model
+├── reverse_sampling.jl
+├── nosing_example.jl
+├── train_example.jl
+├── train.jl
+└── unet.jl                                     the top-level model (currently encoder-only)
 ```
 
 ## Getting Started
 
-Inside your `folder` install this package using the Julia REPL and its package manager:
-
-```
-(@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#encoder
-```
-
-Download [test.jl](src/test.jl), [train.jl](src/train.jl) and [SyntheticImages500.mat](src/SyntheticImages500.mat) and place them next to each other inside a `folder` of your liking:
-
-```
-folder/
-├─ SyntheticImages500.mat
-├─ test.jl
-├─ train.jl
-```
-
-### Visualizing the Noising Process
-
-Run `test.jl` for a quick demo of the noising is applied to images:
-
-```
-julia> include("test.jl")
-```
-
-### Training
-
-Run `train.jl` to train the diffusion model
-
-```
-julia> include("train.jl")
-```
+Get acknowledged with our [Getting Started Guide](docs/GETTINGSTARTED.md) to see some use cases including visualization of the noising process as well as training of the diffusion model.
 
 ## References
 

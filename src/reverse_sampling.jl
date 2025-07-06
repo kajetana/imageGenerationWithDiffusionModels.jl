@@ -19,7 +19,7 @@ function reverse_sample(model, shape::NTuple{4,Int};
 
     for t in T:-1:1
         batch = shape[end]
-        t_vec = fill(Float32(t), batch)
+        t_vec = fill(Int(t), batch)
 
         eps_pred = model(x_t, t_vec)
 
