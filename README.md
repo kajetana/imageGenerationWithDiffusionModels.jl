@@ -9,23 +9,46 @@
 
 This Julia package implements a diffusion model to generate images of digits
 
-![](/Screenshot%202025-06-10%20at%2012.45.06.png)
+![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
 
-The source code is structured as follows
+The source code is structured as follows.
+
+TODO
 
 ```
 src/
+├── imageGenerationWithDiffusionModels.jl       package
+...
+```
+
+TODO
+
+```
+...
+├── unet.jl                                     the top-level model (currently encoder-only)
 ├── blocks.jl                                   reusable bricks (no task-specific code)
-├── cosine_beta_schedule.jl
-├── embeddings.jl
 ├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
-├── imageGenerationWithDiffusionModels.jl
-├── model.bson                                  pre-trained model
-├── reverse_sampling.jl
+├── embeddings.jl
+├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function.
+├── reverse_sampling.jl                         predicts digits out with the trained model out of pure noise
+...
+```
+
+TODO
+
+```
+...
 ├── nosing_example.jl
 ├── train_example.jl
-├── train.jl
-└── unet.jl                                     the top-level model (currently encoder-only)
+...
+```
+
+TODO
+
+```
+...
+├── SyntheticImages500.mat                      digit dataset
+└── model.bson                                  pre-trained model
 ```
 
 ## Getting Started
