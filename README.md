@@ -32,25 +32,7 @@ Model architecture components and utility functions:
 ├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
 ├── embeddings.jl                               embeddings
 ├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function
-├── reverse_sampling.jl                         reverses the diffusion process
-...
-```
-
-Executable use case scenarios:
-
-```
-...
-├── nosing_example.jl                           visualization of the noising application process      
-├── train_example.jl                            model training
-...
-```
-
-Base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/SRpaper.zip) and a pre-trained model:
-
-```
-...
-├── SyntheticImages500.mat                      digit dataset
-└── model.bson                                  pre-trained model
+└── reverse_sampling.jl                         reverses the diffusion process
 ```
 
 ## Getting Started
