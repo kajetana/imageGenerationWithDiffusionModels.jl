@@ -30,7 +30,7 @@ folder/
 
 ### Visualizing the Noising Process
 
-![](/Screenshot%202025-06-10%20at%2012.45.06.png)
+![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
 
 Run `noising_example.jl` for a quick demo of how the noising is applied to images across different timesteps:
 
@@ -40,7 +40,7 @@ julia> include("noising_example.jl")
 
 ### Training and Reverse Sampling
 
-![](/Screenshot%202025-06-10%20at%2012.45.06.png)
+![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
 
 You can train the model by yourself, adjust the training variables:
 
