@@ -30,7 +30,7 @@ Model architecture components and utility functions:
 ├── unet.jl                                     the top-level model (currently encoder-only)
 ├── blocks.jl                                   reusable bricks (no task-specific code)
 ├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
-├── embeddings.jl
+├── embeddings.jl                               embeddings
 ├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function
 ├── reverse_sampling.jl                         reverses the diffusion process
 ...
@@ -57,7 +57,7 @@ Base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/SRpaper.zip) an
 
 Get acknowledged with our 
 
-[Getting Started Guide](docs/GETTINGSTARTED.md) 
+- [Getting Started Guide](docs/GETTINGSTARTED.md) 
 
 to see some use cases including visualization of the noising process as well as training of the diffusion model.
 
@@ -65,6 +65,6 @@ to see some use cases including visualization of the noising process as well as 
 
 > "Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
 
-> "DenoisingDiffusion.jl" GitHub Repository by Lior Sinai 
+> "DenoisingDiffusion.jl" GitHub Repository by Lior Sinai (https://github.com/LiorSinai/DenoisingDiffusion.jl)
 
 > "DDPM" GitHub Repository by ytdeepia (https://github.com/ytdeepia/DDPM)
