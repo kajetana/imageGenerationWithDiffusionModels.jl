@@ -5,6 +5,7 @@ include("reverse_sampling.jl")
 using Flux
 using ImageView
 using BSON: @save, @load
+using Statistics
 
 ###############################################################################################################
 # loading and preprocessing data
@@ -59,14 +60,14 @@ model = imageGenerationWithDiffusionModels.unet(
 
 # training variables
 learning_rate = 0.001
-epochs = 5
+epochs = 25
 batch_size = 32
 shuffle = true
 
 # noising variables
 num_timesteps = 100
-beta = imageGenerationWithDiffusionModels.cosine_beta_schedule(num_timesteps) # cosine schedule
-#beta =  LinRange(1e-4, 0.02, 100) # linear schedule
+#beta = imageGenerationWithDiffusionModels.cosine_beta_schedule(num_timesteps) # cosine schedule
+beta =  LinRange(1e-4, 0.02, 100) # linear schedule
 alphaBar = cumprod(1 .- beta)
 
 # optimizer
@@ -75,13 +76,16 @@ optimizer = Flux.setup(Adam(learning_rate), model)
 # training set, no classification, unsupervised training
 training_data = Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
 
-training = false
+training = true
 
 if training
     losses = Float32[]
 
     println("Training...")
     for epoch in 1:epochs
+
+        losses_epoch = Float32[]
+
         for batch in training_data
             batch = batch[1]
 
@@ -100,7 +104,12 @@ if training
             Flux.update!(optimizer, model, grads[1])
 
             push!(losses, loss)
+
+            push!(losses_epoch, loss)
+
         end
+
+        println("Mean Loss in Epoch: ", mean(losses_epoch))
     end
 
     println("Training finshed!")
@@ -117,7 +126,7 @@ end
 # reverse sampling
 ##############################################################################################################
 
-x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=num_timesteps, alpha_hats=alphaBar)
+x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=100, alpha_hats=alphaBar)
 #print(size(x))
 
 x = reshape(x, 32, 32)

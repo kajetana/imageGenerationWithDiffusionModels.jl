@@ -7,21 +7,23 @@
 > [!WARNING]
 > This project is currently under development
 
-This Julia package implements a diffusion model to generate images of digits
+This Julia package implements a diffusion model to generate images of digits. It learns how noise alters the data and then predicts how to reverse this process to retrieve digits out of pure noise. This project can serve as a basis for more complex diffusion models. 
 
 ![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
 
+## Source Code
+
 The source code is structured as follows.
 
-TODO
+The main module, which combines all the core components into a package:
 
 ```
 src/
-├── imageGenerationWithDiffusionModels.jl       package
+├── imageGenerationWithDiffusionModels.jl       main module of the package
 ...
 ```
 
-TODO
+Model architecture components and utility functions:
 
 ```
 ...
@@ -29,21 +31,21 @@ TODO
 ├── blocks.jl                                   reusable bricks (no task-specific code)
 ├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
 ├── embeddings.jl
-├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function.
-├── reverse_sampling.jl                         predicts digits out with the trained model out of pure noise
+├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function
+├── reverse_sampling.jl                         reverses the diffusion process
 ...
 ```
 
-TODO
+Executable use case scenarios:
 
 ```
 ...
-├── nosing_example.jl
-├── train_example.jl
+├── nosing_example.jl                           visualization of the noising application process      
+├── train_example.jl                            model training
 ...
 ```
 
-TODO
+Base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/SRpaper.zip) and a pre-trained model:
 
 ```
 ...
@@ -53,12 +55,16 @@ TODO
 
 ## Getting Started
 
-Get acknowledged with our [Getting Started Guide](docs/GETTINGSTARTED.md) to see some use cases including visualization of the noising process as well as training of the diffusion model.
+Get acknowledged with our 
+
+[Getting Started Guide](docs/GETTINGSTARTED.md) 
+
+to see some use cases including visualization of the noising process as well as training of the diffusion model.
 
 ## References
 
-"Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
+> "Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
 
-DDPM Git Repository by ytdeepia (https://github.com/ytdeepia/DDPM/blob/main/src/training.py)
+> "DenoisingDiffusion.jl" GitHub Repository by Lior Sinai 
 
-TODO
+> "DDPM" GitHub Repository by ytdeepia (https://github.com/ytdeepia/DDPM)

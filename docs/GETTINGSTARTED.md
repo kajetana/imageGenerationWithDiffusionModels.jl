@@ -42,7 +42,7 @@ julia> include("noising_example.jl")
 
 ![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
 
-You can train the model by yourself, adjust the training variables:
+You can train the model by yourself by adjusting the training variables:
 
 ```
 # training variables
