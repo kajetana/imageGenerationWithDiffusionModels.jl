@@ -7,7 +7,7 @@ Download the [`example`](https://github.com/kajetana/imageGenerationWithDiffusio
 (jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
 ```
 
-and install all dependencies listed in `Project.toml`:
+and install all dependencies listed in [`Project.toml`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/blob/main/Project.toml):
 
 ```
 BSON = "0.3.9"
