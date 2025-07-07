@@ -10,5 +10,11 @@ Documentation for [imageGenerationWithDiffusionModels](https://github.com/kajeta
 ```
 
 ```@autodocs
-Modules = [imageGenerationWithDiffusionModels]
+Modules = [
+    imageGenerationWithDiffusionModels,
+    imageGenerationWithDiffusionModels.FeatureEncoderNetwork,
+    imageGenerationWithDiffusionModels.Scheduler,
+    imageGenerationWithDiffusionModels.Embeddings,
+    imageGenerationWithDiffusionModels.UNet
+]
 ```
