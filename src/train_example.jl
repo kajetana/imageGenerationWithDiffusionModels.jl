@@ -1,7 +1,11 @@
 include("imageGenerationWithDiffusionModels.jl")
 using .imageGenerationWithDiffusionModels
+include("reverse_sampling.jl")
 
 using Flux
+using ImageView
+using BSON: @save, @load
+using Statistics
 
 ###############################################################################################################
 # loading and preprocessing data
@@ -56,13 +60,14 @@ model = imageGenerationWithDiffusionModels.unet(
 
 # training variables
 learning_rate = 0.001
-epochs = 5
+epochs = 25
 batch_size = 32
 shuffle = true
 
 # noising variables
 num_timesteps = 100
-beta = imageGenerationWithDiffusionModels.cosine_beta_schedule(num_timesteps)
+#beta = imageGenerationWithDiffusionModels.cosine_beta_schedule(num_timesteps) # cosine schedule
+beta =  LinRange(1e-4, 0.02, 100) # linear schedule
 alphaBar = cumprod(1 .- beta)
 
 # optimizer
@@ -71,40 +76,66 @@ optimizer = Flux.setup(Adam(learning_rate), model)
 # training set, no classification, unsupervised training
 training_data = Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
 
-# test
-batch = first(training_data)
-#println(batch)
-#println(batch[1])
-#println(typeof(batch[1]))
-# println(size(batch[1]))
-# println(size(batch[1], 4))
-#println(size(batch[1][:, :, :, :]))
-#println(size(batch[1][:, :, :, 1]))
-# print(typeof(rand(1:num_timesteps, batch_size)))
+training = true
 
-losses = Float32[]
+if training
+    losses = Float32[]
 
-println("Training...")
-for epoch in 1:epochs
-    for batch in training_data
-        batch = batch[1]
+    println("Training...")
+    for epoch in 1:epochs
 
-        imgs = similar(batch)
-        noise = similar(batch)
+        losses_epoch = Float32[]
 
-        timesteps = rand(1:num_timesteps, size(batch, 4))
+        for batch in training_data
+            batch = batch[1]
 
-        # iterate over the images in batch and apply noise
-        for i in 1:size(batch, 4)
-            imgs[:, :, :, i], noise[:, :, :, i] = imageGenerationWithDiffusionModels.add_noise_to_image(batch[:, :, :, i], timesteps[i], alphaBar)
+            imgs = similar(batch)
+            noise = similar(batch)
+
+            timesteps = rand(1:num_timesteps, size(batch, 4))
+
+            # iterate over the images in batch and apply noise
+            for i in 1:size(batch, 4)
+                imgs[:, :, :, i], noise[:, :, :, i] = imageGenerationWithDiffusionModels.add_noise_to_image(batch[:, :, :, i], timesteps[i], alphaBar)
+            end
+
+            loss, grads = Flux.withgradient(m -> Flux.mse(model(imgs, timesteps), noise), model)
+
+            Flux.update!(optimizer, model, grads[1])
+
+            push!(losses, loss)
+
+            push!(losses_epoch, loss)
+
         end
 
-        loss, grads = Flux.withgradient(m -> Flux.mse(model(imgs, timesteps), noise), model)
-
-        Flux.update!(optimizer, model, grads[1])
-
-        push!(losses, loss)
+        println("Mean Loss in Epoch: ", mean(losses_epoch))
     end
-end
 
-println("Training finshed!")
+    println("Training finshed!")
+
+    # credits for saving/loading the mode
+    # https://stackoverflow.com/questions/68335891/how-to-load-a-trained-model-with-bson-in-flux-jl
+
+    @save "model.bson" model
+else
+    @load "model.bson" model
+end 
+
+###############################################################################################################
+# reverse sampling
+##############################################################################################################
+
+x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=100, alpha_hats=alphaBar)
+#print(size(x))
+
+x = reshape(x, 32, 32)
+
+img = rand(32,32)
+gui = ImageView.imshow(img)
+canvas = gui["gui"]["canvas"]
+
+ImageView.imshow(canvas, x)
+sleep(8.0)
+
+ImageView.close(gui["gui"]["window"])

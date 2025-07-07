@@ -2,61 +2,69 @@
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://kajetana.github.io/imageGenerationWithDiffusionModels.jl/dev/)
 [![Build Status](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/kajetana/imageGenerationWithDiffusionModels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/kajetana/imageGenerationWithDiffusionModels.jl)
 
 > [!WARNING]
 > This project is currently under development
 
-This Julia package implements a diffusion model to generate images of digits
+This Julia package implements a diffusion model to generate images of digits. It learns how noise alters the data and then predicts how to reverse this process to retrieve digits out of pure noise. This project can serve as a basis for more complex diffusion models. 
 
-![](/Screenshot%202025-06-10%20at%2012.45.06.png)
+![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
+
+## Source Code
+
+The source code is structured as follows.
+
+The main module, which combines all the core components into a package:
 
 ```
-TODO
-
 src/
-├── blocks.jl               # reusable bricks (no task-specific code)
-├── feature_encoder_network.jl  # down-sampling “encoder” built from the bricks
-└── unet.jl                 # the top-level model (currently encoder-only)
+├── imageGenerationWithDiffusionModels.jl       main module of the package
+...
+```
+
+Model architecture components and utility functions:
+
+```
+...
+├── unet.jl                                     the top-level model (currently encoder-only)
+├── blocks.jl                                   reusable bricks (no task-specific code)
+├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
+├── embeddings.jl
+├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function
+├── reverse_sampling.jl                         reverses the diffusion process
+...
+```
+
+Executable use case scenarios:
+
+```
+...
+├── nosing_example.jl                           visualization of the noising application process      
+├── train_example.jl                            model training
+...
+```
+
+Base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/SRpaper.zip) and a pre-trained model:
+
+```
+...
+├── SyntheticImages500.mat                      digit dataset
+└── model.bson                                  pre-trained model
 ```
 
 ## Getting Started
 
-Inside your `folder` install this package using the Julia REPL and its package manager:
+Get acknowledged with our 
 
-```
-(@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#encoder
-```
+[Getting Started Guide](docs/GETTINGSTARTED.md) 
 
-Download [test.jl](src/test.jl), [train.jl](src/train.jl) and [SyntheticImages500.mat](src/SyntheticImages500.mat) and place them next to each other inside a `folder` of your liking:
-
-```
-folder/
-├─ SyntheticImages500.mat
-├─ test.jl
-├─ train.jl
-```
-
-### Visualizing the Noising Process
-
-Run `test.jl` for a quick demo of the noising is applied to images:
-
-```
-julia> include("test.jl")
-```
-
-### Training
-
-Run `train.jl` to train the diffusion model
-
-```
-julia> include("train.jl")
-```
+to see some use cases including visualization of the noising process as well as training of the diffusion model.
 
 ## References
 
-"Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
+> "Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
 
-DDPM Git Repository by ytdeepia (https://github.com/ytdeepia/DDPM/blob/main/src/training.py)
+> "DenoisingDiffusion.jl" GitHub Repository by Lior Sinai 
 
-TODO
+> "DDPM" GitHub Repository by ytdeepia (https://github.com/ytdeepia/DDPM)

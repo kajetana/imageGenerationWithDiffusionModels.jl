@@ -4,13 +4,14 @@ using Flux
 import Flux: gradient
 
 const SRC = joinpath(@__DIR__, "..", "src")
-include(joinpath(SRC, "blocks.jl"))                   # module Blocks
-include(joinpath(SRC, "embeddings.jl"))               # module Embeddings
-include(joinpath(SRC, "feature_encoder_network.jl"))  # make_down_path
-include(joinpath(SRC, "unet.jl"))                     # make_unet
+include(joinpath(SRC, "blocks.jl"))                                 # module Blocks
+include(joinpath(SRC, "embeddings.jl"))                             # module Embeddings
+include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_path
+include(joinpath(SRC, "unet.jl"))                                   # make_unet
 include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
+include(joinpath(SRC, "cosine_beta_schedule.jl"))
 
-using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet
+using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet, .Scheduler
 #TODO: Write test set for unet.jl
 
 #sample timesteps --> embed them --> feed embedding plus image into the encoder/UNet
@@ -105,14 +106,15 @@ end
     end
 
     @testset "add_noise_to_image" begin
-        beta = LinRange(1e-4, 0.02, 500)  # posterior variance
-        alphaBar = cumprod(1 .-beta)
-
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
         data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
+
+        # linear
+        beta = LinRange(1e-4, 0.02, 500)
+        alphaBar = cumprod(1 .-beta)
 
         @test imageGenerationWithDiffusionModels.add_noise_to_image(img, 0, alphaBar) == img
 
@@ -122,6 +124,18 @@ end
         @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, 500, alphaBar)) == Matrix{Float64}
     
         @test size(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, 500, alphaBar)) == (32, 32)
+
+        # cosine
+        beta2 = imageGenerationWithDiffusionModels.cosine_beta_schedule(500)
+        alphaBar2 = cumprod(1 .- beta)
+
+        @test imageGenerationWithDiffusionModels.add_noise_to_image(img, 0, alphaBar2) == img
+
+        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar2)
+
+        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, 500, alphaBar2)) == Matrix{Float64}
+    
+        @test size(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, 500, alphaBar2)) == (32, 32)
     end
 
     @testset "visualize_noising_of_image" begin
@@ -140,3 +154,10 @@ end
 
 end
 
+@testset "cosine_beta_schedule.jl" begin
+    num_timesteps = 100
+
+    @test typeof(cosine_beta_schedule(num_timesteps)) == Vector{Float64}
+
+    @test length(cosine_beta_schedule(num_timesteps)) == 100
+end
