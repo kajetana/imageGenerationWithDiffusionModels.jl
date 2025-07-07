@@ -1,6 +1,4 @@
-include("imageGenerationWithDiffusionModels.jl")
-using .imageGenerationWithDiffusionModels
-include("reverse_sampling.jl")
+using imageGenerationWithDiffusionModels
 
 using Flux
 using ImageView

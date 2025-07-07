@@ -1,5 +1,4 @@
-#using imageGenerationWithDiffusionModels
-include("imageGenerationWithDiffusionModels.jl")
+using imageGenerationWithDiffusionModels
 using ImageView
 
 ###############################################################################################################
