@@ -60,7 +60,7 @@ function unet(
     )
     unet(time_embed, chain, num_levels)
 end
-function (u::unet)(x::AbstractArray, timesteps::AbstractVector{Int})
+function (u::unet)(x::AbstractArray, timesteps::AbstractVector)
     emb = u.time_embedding(timesteps)
     h = u.chain(x, emb)
     h
