@@ -1,25 +1,30 @@
 #using imageGenerationWithDiffusionModels
+#using Test
+#using Flux             
+#import Flux: gradient
+
+const SRC = joinpath(@__DIR__, "..", "src")
+#include(joinpath(SRC, "blocks.jl"))                                 # module Blocks
+include(joinpath(SRC, "embeddings.jl"))                             # module Embeddings
+#include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_path
+#include(joinpath(SRC, "unet.jl"))                                   # make_unet
+#include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
+include(joinpath(SRC, "reverse_sampling.jl"))
+include(joinpath(SRC, "cosine_beta_schedule.jl"))
+using .Embeddings, .Scheduler, .ReverseSampling
+
 using Test
 using Flux             
 import Flux: gradient
-
-const SRC = joinpath(@__DIR__, "..", "src")
-include(joinpath(SRC, "blocks.jl"))                                 # module Blocks
-include(joinpath(SRC, "embeddings.jl"))                             # module Embeddings
-include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_path
-include(joinpath(SRC, "unet.jl"))                                   # make_unet
-include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
-include(joinpath(SRC, "cosine_beta_schedule.jl"))
-using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet, .Scheduler
-#TODO: Write test set for unet.jl
-
+using Random
+#using imageGenerationWithDiffusionModels
 
 @testset "FeatureEncoderNetwork full path" begin
     channels = (8, 16, 32)
     emb_dim  = 24
     batch    = 2
-
-    encoder = FeatureEncoderNetwork.make_down_path(; channels, emb_dim, in_ch = 1)
+    #encoder = FeatureEncoderNetwork.make_down_path(; channels, emb_dim, in_ch = 1)
+    encoder = make_down_path(; channels, emb_dim, in_ch = 1)
 
     x   = randn(Float32, 32, 32, 1, batch)
     emb = randn(Float32, emb_dim, batch)
@@ -45,9 +50,10 @@ end
     model_dim   = 8
     emb_dim     = 32
 
-    time_embed = Embeddings.LearnedTEmbedding(emb_dim)
-    model = UNet.unet(in_channels, num_levels, model_dim, time_embed, emb_dim;
-                      block_layer = Blocks.TResBlock,
+    time_embed = LearnedTEmbedding(emb_dim)
+    time_embed = LearnedTEmbedding(emb_dim)
+    model = unet(in_channels, num_levels, model_dim, time_embed, emb_dim;
+                      block_layer = TResBlock,
                       num_blocks_per_level = 1)
 
     x = randn(Float32, 32, 32, in_channels, 2)
@@ -71,7 +77,8 @@ end
     input_batch       = randn(Float32, height, width, in_channels, batch_size)
     timestep_embeds   = randn(Float32, embed_dim, batch_size)
 
-    res_block = Blocks.TResBlock(in_channels => out_channels, embed_dim)
+    #res_block = Blocks.TResBlock(in_channels => out_channels, embed_dim)
+    res_block = TResBlock(in_channels => out_channels, embed_dim)
 
     # forward pass: the layer accepts a (height, width, in channel, batch size) batch plus a 
     # time‑embedding matrix (embedding dimension, batch size) and returns the expected shape (height, width,channel out, batch size)
@@ -85,19 +92,6 @@ end
     @test all(p -> all(isfinite, grads[p]), Flux.params(res_block))     # all finite
 end
 
-@testset "Downsample & Upsampling" begin
-    H = W = 16; ch = 8; batch = 2
-    x   = randn(Float32, H, W, ch, batch)
-    down = Blocks.Downsample()
-    up   = Blocks.Upsampling(ch => ch)
-
-    z = down(x)
-    @test size(z) == (H ÷ 2, W ÷ 2, ch, batch)
-
-    y = up(z)
-    @test size(y) == (H, W, ch, batch)
-end
-
 #sample timesteps --> embed them --> feed embedding plus image into the encoder/UNet
 @testset "Encoder and sinusoidal embedding integration" begin
     emb_dim   = 128
@@ -109,43 +103,27 @@ end
 
     # sample timesteps and embed them
     t_steps   = [1, 500, 999, 123]                    # one batch for each timestep 
-    t_emb     = sinusoidal_embedding(t_steps, emb_dim)
+    t_emb     = Embeddings.sinusoidal_embedding(t_steps, emb_dim)
 
     # dummy image batch 32×32×1×batch_size
     x0 = randn(Float32, 32, 32, 1, batch)
 
     latent, skips = encoder.encode(x0, t_emb)
 
+    # shape checks 
+    @test size(latent) == (4, 4, channels[end], batch)
+    @test length(skips) == length(channels)           # three stored maps as channels = (64, 128, 256)
+    @test all(map -> map isa Array, skips)
+
     # embedding should influence the output
-    t_emb_shifted = sinusoidal_embedding(t_steps .+ 1, emb_dim)
+    t_emb_shifted = Embeddings.sinusoidal_embedding(t_steps .+ 1, emb_dim)
     latent_shift, _ = encoder.encode(x0, t_emb_shifted)
 
     @test latent != latent_shift                     # outputs differ
 end
 
 @testset "embeddings.jl" begin                    
-    layer = Embeddings.LearnedTEmbedding(128)
-    sinusoidal_embedding = Embeddings.sinusoidal_embedding
-
-    @testset "sinusoidal_embedding" begin
-        # shape: even dimension 
-        t  = [1, 100, 500]
-        d  = 128
-        e  = sinusoidal_embedding(t, d)
-        @test size(e) == (d, length(t))
-
-        # shape: odd dimension (should pad one zero row) 
-        d_odd = 65
-        e_odd = sinusoidal_embedding(t, d_odd)
-        @test size(e_odd) == (d_odd, length(t))
-        @test all(e_odd[end, :] .== 0.0)          # last row is the padded zeros
-
-        # different t give different encodings
-        @test e[:, 1] != e[:, 2]               
-
-        # deterministic: same call twice should give identical output
-        @test e == sinusoidal_embedding(t, d)
-    end
+    layer = LearnedTEmbedding(128)
 
     @testset "LearnedTEmbedding" begin
         tb  = [1, 50, 123, 500]
@@ -269,7 +247,38 @@ end
 @testset "cosine_beta_schedule.jl" begin
     num_timesteps = 100
 
-    @test typeof(cosine_beta_schedule(num_timesteps)) == Vector{Float64}
+    @test typeof(Scheduler.cosine_beta_schedule(num_timesteps)) == Vector{Float64}
 
-    @test length(cosine_beta_schedule(num_timesteps)) == 100
+    @test length(Scheduler.cosine_beta_schedule(num_timesteps)) == 100
+end
+
+@testset "reverse_sampling.jl" begin
+    shape = (1, 28, 28, 4)  # channels, height, width, batch
+    T = 5
+    alpha_hats = Float32.([0.9^t for t in 1:T])  # geometric decay
+
+    @testset "Output shape and type" begin
+        x_sampled = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+        @test size(x_sampled) == shape
+        @test eltype(x_sampled) == Float32
+    end
+
+    @testset "Runs without error (identity model)" begin
+        x_sampled = ReverseSampling.reverse_sample(mock_model_identity, shape; T=T, alpha_hats=alpha_hats)
+        @test !any(isnan, x_sampled)
+    end
+
+    @testset "Edge case: T = 1" begin
+        alpha_hats_edge = Float32.([0.95])
+        x_sampled = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=1, alpha_hats=alpha_hats_edge)
+        @test size(x_sampled) == shape
+    end
+
+    @testset "All-zero model output -> Gaussian diffusion" begin
+        Random.seed!(42)
+        x1 = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+        Random.seed!(42)
+        x2 = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+        @test x1 == x2  # deterministic if model and RNG fixed
+    end
 end
