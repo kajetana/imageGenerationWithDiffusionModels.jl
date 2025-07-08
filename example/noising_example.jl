@@ -18,20 +18,22 @@ data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)  # Explici
 # https://discourse.julialang.org/t/update-existing-imshow-with-new-image-data/8296/6
 ###############################################################################################################
 
-images = data["syntheticImages"]
+# temp fix
 
-# "dummy" image to generate the window
-img = rand(32,32*11)
-gui = ImageView.imshow(img)
-canvas = gui["gui"]["canvas"]
+# images = data["syntheticImages"]
 
-# display the noising process for the first few images of the dataset
-for i in 1:4
-    img = images[:, :, 1, i]
+# # "dummy" image to generate the window
+# img = rand(32,32*11)
+# gui = ImageView.imshow(img)
+# canvas = gui["gui"]["canvas"]
 
-    img = imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)
-    ImageView.imshow(canvas, img)
-    sleep(4.0) 
-end
+# # display the noising process for the first few images of the dataset
+# for i in 1:4
+#     img = images[:, :, 1, i]
 
-ImageView.close(gui["gui"]["window"])
+#     img = imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)
+#     ImageView.imshow(canvas, img)
+#     sleep(4.0) 
+# end
+
+# ImageView.close(gui["gui"]["window"])
