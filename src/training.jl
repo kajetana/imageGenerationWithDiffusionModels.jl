@@ -132,14 +132,16 @@ function train(;FILE_PATH = "./example/SyntheticImages500.mat",
     
     x = reshape(x, 32, 32)
 
-    img = rand(32,32)
-    gui = ImageView.imshow(img)
-    canvas = gui["gui"]["canvas"]
+    # temp fix
 
-    ImageView.imshow(canvas, x)
-    sleep(10.0)
+    # img = rand(32,32)
+    # gui = ImageView.imshow(img)
+    # canvas = gui["gui"]["canvas"]
 
-    ImageView.close(gui["gui"]["window"])
+    # ImageView.imshow(canvas, x)
+    # sleep(10.0)
+
+    # ImageView.close(gui["gui"]["window"])
 end
 
 export train
