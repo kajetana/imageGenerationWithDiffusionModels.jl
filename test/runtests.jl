@@ -2,16 +2,17 @@
 using Test
 using Flux             
 import Flux: gradient
-
+using imageGenerationWithDiffusionModels
 const SRC = joinpath(@__DIR__, "..", "src")
-include(joinpath(SRC, "blocks.jl"))                                 # module Blocks
-include(joinpath(SRC, "embeddings.jl"))                             # module Embeddings
-include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_path
-include(joinpath(SRC, "unet.jl"))                                   # make_unet
-include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
-include(joinpath(SRC, "cosine_beta_schedule.jl"))
+# include(joinpath(SRC, "blocks.jl"))                                 # module Blocks
+# #include(joinpath(SRC, "embeddings.jl"))                             # module Embeddings
+# include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_path
+# #include(joinpath(SRC, "unet.jl"))                                   # make_unet
+# include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
+# #include(joinpath(SRC, "cosine_beta_schedule.jl"))
+# include("blocktests.jl")
 
-using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet, .Scheduler
+# using .Blocks, .FeatureEncoderNetwork
 #TODO: Write test set for unet.jl
 
 #sample timesteps --> embed them --> feed embedding plus image into the encoder/UNet
@@ -45,8 +46,7 @@ using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet, .Scheduler
 end
 
 @testset "embeddings.jl" begin                    
-    layer = Embeddings.LearnedTEmbedding(128)
-    sinusoidal_embedding = Embeddings.sinusoidal_embedding
+    layer = LearnedTEmbedding(128)
 
     @testset "sinusoidal_embedding" begin
         # shape: even dimension 

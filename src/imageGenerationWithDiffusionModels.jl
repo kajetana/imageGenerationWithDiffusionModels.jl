@@ -112,6 +112,22 @@ end
 # Exports
 ###############################################################################################################
 
-export load_digits_data, add_noise_to_image,add_noise_to_image_visualization, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule,train
+export load_digits_data, 
+    add_noise_to_image,
+    add_noise_to_image_visualization, 
+    visualize_noising_of_image, 
+    _add_unet_level, 
+    TResBlock, 
+    unet, 
+    LearnedTEmbedding, 
+    sinusoidal_embedding, 
+    cosine_beta_schedule,
+    train,
+    ConditionalChain,
+    ConditionalSkipConnection,
+    cat_on_channel_dim,
+    sinusoidal_embedding,
+    cosine_beta_schedule,
+    make_down_path
 
 end
