@@ -194,3 +194,35 @@ end
 
     @test length(cosine_beta_schedule(num_timesteps)) == 100
 end
+
+@testset "reverse_sampling.jl" begin
+    shape = (1, 28, 28, 4)  # channels, height, width, batch
+    T = 5
+    alpha_hats = Float32.([0.9^t for t in 1:T])  # geometric decay
+
+    @testset "Output shape and type" begin
+        x_sampled = reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+        @test size(x_sampled) == shape
+        @test eltype(x_sampled) == Float32
+    end
+
+    @testset "Runs without error (identity model)" begin
+        x_sampled = reverse_sample(mock_model_identity, shape; T=T, alpha_hats=alpha_hats)
+        @test !any(isnan, x_sampled)
+    end
+
+    @testset "Edge case: T = 1" begin
+        alpha_hats_edge = Float32.([0.95])
+        x_sampled = reverse_sample(mock_model_zeros, shape; T=1, alpha_hats=alpha_hats_edge)
+        @test size(x_sampled) == shape
+    end
+
+    @testset "All-zero model output -> Gaussian diffusion" begin
+        Random.seed!(42)
+        x1 = reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+        Random.seed!(42)
+        x2 = reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+        @test x1 == x2  # deterministic if model and RNG fixed
+    end
+end
+
