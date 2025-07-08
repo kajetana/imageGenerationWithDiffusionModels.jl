@@ -1,13 +1,13 @@
 # Getting Started Guide
 
-Inside a `folder` of your liking, install this package using the Julia REPL and its package manager:
+Download the [`example`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/tree/main/example) folder with its contents, install this package using the Julia REPL and its package manager:
 
 ```
 (@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl#encoder
+(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
 ```
 
-and install all dependencies listed in `Project.toml`:
+and install all dependencies listed in [`Project.toml`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/blob/main/Project.toml):
 
 ```
 BSON = "0.3.9"
@@ -19,13 +19,21 @@ Random = "1.11.0"
 julia = "1.11"
 ```
 
-Download [noising_example.jl](src/test.jl), [train_example.jl](src/train.jl) and [SyntheticImages500.mat](src/SyntheticImages500.mat) and place them next to each other inside a `folder` of your liking:
+Inside the downloaded `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the following sections:
 
 ```
-folder/
-├─ SyntheticImages500.mat
-├─ noising_example.jl
-├─ train_example.jl
+example/
+├── nosing_example.jl                           visualization of the noising application process      
+├── train_example.jl                            model training
+...
+```
+
+as well as our base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/SRpaper.zip) and a pre-trained model:
+
+```
+...
+├── SyntheticImages500.mat                      digit dataset
+└── model.bson                                  pre-trained model
 ```
 
 ### Visualizing the Noising Process
@@ -40,9 +48,7 @@ julia> include("noising_example.jl")
 
 ### Training and Reverse Sampling
 
-![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
-
-You can train the model by yourself, adjust the training variables:
+You can train the model by yourself by adjusting the training variables:
 
 ```
 # training variables

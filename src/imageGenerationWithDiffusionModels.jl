@@ -54,7 +54,7 @@ function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
         error()
     end
     
-    sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # TODO        
+    sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # amount of noise        
     z = randn(rng, eltype(img), size(img))                                        # noise
     return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z, z      # noise the image
 end
@@ -64,7 +64,7 @@ end
 ###############################################################################################################
 
 """
-    add_noise_to_image_old(img::Vector{Float64}, noise_step::Int64, alpha_bar::Vector{Float64}; rng = Random.GLOBAL_RNG)
+    add_noise_to_image_visualization(img::Vector{Float64}, noise_step::Int64, alpha_bar::Vector{Float64}; rng = Random.GLOBAL_RNG)
 
 Applies Gaussian noise to an image.
 
@@ -77,7 +77,7 @@ Applies Gaussian noise to an image.
 # Returns
 A noised version of image
 """
-function add_noise_to_image_old(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
+function add_noise_to_image_visualization(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     if noise_step == 0
         return img
     end
@@ -86,7 +86,7 @@ function add_noise_to_image_old(img, noise_step, alpha_bar, rng = Random.GLOBAL_
         error()
     end
     
-    sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # TODO        
+    sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # amount of noise         
     z = randn(rng, eltype(img), size(img))                                        # noise
     return sqrt(alpha_bar[noise_step]).* img .+ sqrtOneMinusalphaBar .* z         # noise the image
 end
@@ -106,7 +106,7 @@ Visualizes the Gaussian noising process of an image.
 An image visualizing the Gaussian noising process of an image horizontally.
 """
 function visualize_noising_of_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
-    return hcat([(imageGenerationWithDiffusionModels.add_noise_to_image_old(img, t, alpha_bar, rng)) for t in noise_step]...)
+    return hcat([(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, t, alpha_bar, rng)) for t in noise_step]...)
 end
 
 ###############################################################################################################
