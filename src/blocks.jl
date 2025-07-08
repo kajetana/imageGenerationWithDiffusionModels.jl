@@ -12,6 +12,7 @@ struct TResBlock<: AbstractParallel
     emb_proj::Dense     # emb_dim → out_channel
 end
 
+Flux.@functor TResBlock
 function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
     TResBlock(
         Conv((3,3), channels; pad = 1),
@@ -20,6 +21,7 @@ function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
         Dense(emb_dim, channels[2])
     )
 end
+
 
 function (m::TResBlock)(x, t_emb)
     #@info "Feature shape before failing conv: ", size(x)

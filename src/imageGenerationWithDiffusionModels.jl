@@ -16,7 +16,7 @@ include("cosine_beta_schedule.jl")
 using .Scheduler
 include("reverse_sampling.jl")
 using .ReverseSampling
-
+include("train.jl")
 # TODO default filepath? return ["syntheticImages"]
 """
     load_digits_data(filepath::String)
@@ -113,6 +113,17 @@ end
 # Exports
 ###############################################################################################################
 
-export load_digits_data, add_noise_to_image, visualize_noising_of_image, _add_unet_level, TResBlock, unet, LearnedTEmbedding, sinusoidal_embedding, cosine_beta_schedule
+export load_digits_data, 
+    add_noise_to_image, 
+    visualize_noising_of_image, 
+    _add_unet_level, 
+    TResBlock, 
+    unet, 
+    LearnedTEmbedding, 
+    sinusoidal_embedding, 
+    cosine_beta_schedule, 
+    ConditionalSkipConnection, 
+    ConditionalChain
+    train
 
 end
