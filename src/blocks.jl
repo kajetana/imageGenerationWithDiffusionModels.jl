@@ -11,7 +11,7 @@ struct TResBlock<: AbstractParallel
     skip::Any           # identity or 1×1 conv
     emb_proj::Dense     # emb_dim → out_channel
 end
-
+Flux.Flux.@functor TResBlock
 function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
     TResBlock(
         Conv((3,3), channels; pad = 1),

@@ -4,7 +4,9 @@ using Flux
 using ImageView
 using BSON: @save, @load
 using Statistics
-
+import imageGenerationWithDiffusionModels.ReverseSampling
+using FileIO, PNGFiles
+using Images
 ###############################################################################################################
 # loading and preprocessing data
 #
@@ -74,7 +76,7 @@ optimizer = Flux.setup(Adam(learning_rate), model)
 # training set, no classification, unsupervised training
 training_data = Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
 
-training = true
+training = false
 
 if training
     losses = Float32[]
@@ -124,16 +126,34 @@ end
 # reverse sampling
 ##############################################################################################################
 
-x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=100, alpha_hats=alphaBar)
-#print(size(x))
+#Reverse sampling file save
+
+# sample one greyscale image with the UNet
+x = ReverseSampling.reverse_sample(model,
+                                   (32,32,1,1);     
+                                   T = 100,
+                                   alpha_hats = alphaBar)
 
 x = reshape(x, 32, 32)
+x = (x .- minimum(x)) ./ (maximum(x) - minimum(x))    # now in [0,1]
+img_rgb = RGB.(x, x, x) # 32×32 Array{RGB}
 
-img = rand(32,32)
-gui = ImageView.imshow(img)
-canvas = gui["gui"]["canvas"]
+save("reverse_sample.png", img)
+println("wrote reverse_sample.png")
+ 
 
-ImageView.imshow(canvas, x)
-sleep(8.0)
+# Reverse sampling window display
 
-ImageView.close(gui["gui"]["window"])
+#x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=100, alpha_hats=alphaBar)
+#print(size(x))
+
+#x = reshape(x, 32, 32)
+
+#img = rand(32,32)
+#gui = ImageView.imshow(img)
+#canvas = gui["gui"]["canvas"]
+
+#ImageView.imshow(canvas, x)
+#sleep(8.0)
+
+#ImageView.close(gui["gui"]["window"])

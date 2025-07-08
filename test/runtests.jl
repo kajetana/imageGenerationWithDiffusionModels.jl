@@ -10,9 +10,93 @@ include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_
 include(joinpath(SRC, "unet.jl"))                                   # make_unet
 include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
 include(joinpath(SRC, "cosine_beta_schedule.jl"))
-
 using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet, .Scheduler
 #TODO: Write test set for unet.jl
+
+
+@testset "FeatureEncoderNetwork full path" begin
+    channels = (8, 16, 32)
+    emb_dim  = 24
+    batch    = 2
+
+    encoder = FeatureEncoderNetwork.make_down_path(; channels, emb_dim, in_ch = 1)
+
+    x   = randn(Float32, 32, 32, 1, batch)
+    emb = randn(Float32, emb_dim, batch)
+
+    latent, skips = encoder.encode(x, emb)
+
+    @test size(latent) == (4, 4, channels[end], batch)
+    @test length(skips) == length(channels)
+    @test all(map -> map isa Array, skips)
+
+    # gradient through the whole encoder
+    params_enc = Flux.params(encoder.encode.down_blocks) # capture blocks
+    grads_enc  = gradient(() -> sum(abs2, first(encoder.encode(x, emb))),
+                          params_enc)
+    @test !isempty(grads_enc)
+    @test all(p -> haskey(grads_enc, p), params_enc)
+    @test all(p -> all(isfinite, grads_enc[p]), params_enc)
+end
+
+@testset "UNet forward / backward end-to-end" begin
+    in_channels = 1
+    num_levels  = 3
+    model_dim   = 8
+    emb_dim     = 32
+
+    time_embed = Embeddings.LearnedTEmbedding(emb_dim)
+    model = UNet.unet(in_channels, num_levels, model_dim, time_embed, emb_dim;
+                      block_layer = Blocks.TResBlock,
+                      num_blocks_per_level = 1)
+
+    x = randn(Float32, 32, 32, in_channels, 2)
+    t = rand(1:1000, 2)                  
+
+    y = model(x, t)
+    @test size(y) == size(x)   # UNet keeps spatial size & channel count
+
+    gs = gradient(() -> sum(abs2, model(x, t)), Flux.params(model))
+    @test !isempty(gs)
+end
+
+
+@testset "Blocks basic forward & backward" begin
+    height = width = 16                 # spatial size of synthetic image
+    batch_size   = 2                    # mini-batch
+    in_channels  = 32                   # feature depth before the block
+    out_channels = 64                   # feature depth after the block
+    embed_dim    = 48                   # width of timestep embedding
+
+    input_batch       = randn(Float32, height, width, in_channels, batch_size)
+    timestep_embeds   = randn(Float32, embed_dim, batch_size)
+
+    res_block = Blocks.TResBlock(in_channels => out_channels, embed_dim)
+
+    # forward pass: the layer accepts a (height, width, in channel, batch size) batch plus a 
+    # time‑embedding matrix (embedding dimension, batch size) and returns the expected shape (height, width,channel out, batch size)
+    output_batch = res_block(input_batch, timestep_embeds)
+    @test size(output_batch) == (height, width, out_channels, batch_size)
+
+    # backward pass:  every parameter receives a finite gradient when back propagate loss
+    grads = gradient(() -> sum(abs2, res_block(input_batch, timestep_embeds)), Flux.params(res_block))
+    @test !isempty(grads)                                               # gradients exist
+    @test all(p -> haskey(grads, p), Flux.params(res_block))            # every parameters hit
+    @test all(p -> all(isfinite, grads[p]), Flux.params(res_block))     # all finite
+end
+
+@testset "Downsample & Upsampling" begin
+    H = W = 16; ch = 8; batch = 2
+    x   = randn(Float32, H, W, ch, batch)
+    down = Blocks.Downsample()
+    up   = Blocks.Upsampling(ch => ch)
+
+    z = down(x)
+    @test size(z) == (H ÷ 2, W ÷ 2, ch, batch)
+
+    y = up(z)
+    @test size(y) == (H, W, ch, batch)
+end
 
 #sample timesteps --> embed them --> feed embedding plus image into the encoder/UNet
 @testset "Encoder and sinusoidal embedding integration" begin
@@ -31,11 +115,6 @@ using .Blocks, .Embeddings, .FeatureEncoderNetwork, .UNet, .Scheduler
     x0 = randn(Float32, 32, 32, 1, batch)
 
     latent, skips = encoder.encode(x0, t_emb)
-
-    # shape checks 
-    @test size(latent) == (4, 4, channels[end], batch)
-    @test length(skips) == length(channels)           # three stored maps as channels = (64, 128, 256)
-    @test all(map -> map isa Array, skips)
 
     # embedding should influence the output
     t_emb_shifted = sinusoidal_embedding(t_steps .+ 1, emb_dim)

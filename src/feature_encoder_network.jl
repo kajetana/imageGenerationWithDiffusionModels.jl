@@ -18,15 +18,20 @@ function make_down_path(; channels=(64,128,256), emb_dim=128, in_ch=1)
                          for (prev, cur) in zip((in_ch, channels[1:end-1]...), channels)]
     downsample_layers = [Downsample() for _ in down_blocks]
 
-    function encode(img, t_emb)
-        intermediates = Vector{Any}()
+    function encode(x, t_emb)
+        #   x: the final down-sampled tensor 
+        #   skips: immutable tuple of feature maps to be used as skip-connections
+        skips = ()                                   # start with an empty tuple
+        
         for (block, pool) in zip(down_blocks, downsample_layers)
-            img = block(img, t_emb)
-            push!(intermediates, img)       # save feature map
-            img = pool(img)                 # 2x down-sample
+            h   = block(x, t_emb)                    # residual / attention block
+            skips = (skips..., h)                    # append new skip to tuple
+            x   = pool(h)                            # 2× spatial down-sample
         end
-        return img, intermediates           # latent and stored maps
+    
+        return x, skips   
     end
+
 
     return (encode = encode,
             out_channels = channels[end])
