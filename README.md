@@ -9,7 +9,7 @@
 
 This Julia package implements a diffusion model to generate images of digits. It learns how noise alters the data and then predicts how to reverse this process to retrieve digits out of pure noise. This project can serve as a basis for more complex diffusion models. 
 
-![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
+![](/docs/noising.png)
 
 ## Source Code
 
@@ -31,6 +31,7 @@ Model architecture components and utility functions:
 ├── blocks.jl                                   reusable bricks (no task-specific code)
 ├── feature_encoder_network.jl                  down-sampling “encoder” built from the bricks
 ├── embeddings.jl                               embeddings
+├── training.jl                                 trains the model
 ├── cosine_beta_schedule.jl                     generates a noise schedule based on a cosine beta function
 └── reverse_sampling.jl                         reverses the diffusion process
 ```

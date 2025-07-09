@@ -1,4 +1,5 @@
 using imageGenerationWithDiffusionModels
+using Images
 
 ###############################################################################################################
 # noising variables
