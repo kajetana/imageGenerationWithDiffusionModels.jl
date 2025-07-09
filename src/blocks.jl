@@ -32,7 +32,7 @@ end
     (m::TResBlock)(x, t_emb)
 Forward pass for the `TResBlock`.
 A `SkipConnection` skips over two convolution layers. `x` is the layer input and t_emb in added to the feature maps as a bias after the first convolution.
-See also [`Flux.SkipConnection`](@ref), [`Flux.Conv`](@ref)
+See also `Flux.SkipConnection`, `Flux.Conv`
 """
 function (m::TResBlock)(x, t_emb)
     #@info "Feature shape before failing conv: ", size(x)
@@ -70,7 +70,7 @@ end
 A skip connection, that accepts multiple inputs (conditional inputs).
 
 The struct holds `layers` that are meant to be skipped and `connection` which rejoins the output of the skipped layers with the input.
-See also [`Flux.SkipConnection`](@ref)
+See also `Flux.SkipConnection`
 """
 struct ConditionalSkipConnection{T,F} <: AbstractParallel
     layers::T           #skipped layers
@@ -102,7 +102,7 @@ _maybe_forward(layer, x::AbstractArray, ys::AbstractArray...) =
 """
     ConditionalChain{T<:Union{Tuple,NamedTuple}} <: AbstractParallel
 A Chain operator, that accepts multiple inputs (conditional inputs).
-See also [`Flux.Chain`](@ref)
+See also `Flux.Chain`
 """
 struct ConditionalChain{T<:Union{Tuple,NamedTuple}} <: AbstractParallel
     layers::T
