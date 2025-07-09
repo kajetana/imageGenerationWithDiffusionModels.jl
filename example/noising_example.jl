@@ -1,5 +1,5 @@
 using imageGenerationWithDiffusionModels
-using ImageView
+using Images
 
 ###############################################################################################################
 # noising variables
@@ -13,25 +13,17 @@ data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)  # Explici
 
 ###############################################################################################################
 # displaying the noising process
-#
-# credits for the technique of displaying different images in 1 window with ImageView: 
-# https://discourse.julialang.org/t/update-existing-imshow-with-new-image-data/8296/6
 ###############################################################################################################
 
 images = data["syntheticImages"]
 
-# "dummy" image to generate the window
-img = rand(32,32*11)
-gui = ImageView.imshow(img)
-canvas = gui["gui"]["canvas"]
-
 # display the noising process for the first few images of the dataset
-for i in 1:4
+for i in 1:3
     img = images[:, :, 1, i]
 
     img = imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)
-    ImageView.imshow(canvas, img)
-    sleep(4.0) 
-end
 
-ImageView.close(gui["gui"]["window"])
+    img = (img .- minimum(img)) ./ (maximum(img) - minimum(img)) 
+    img = RGB.(img, img, img) # 32×32 Array{RGB}
+    save("test" * string(i) * ".png", img)
+end

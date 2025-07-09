@@ -1,25 +1,21 @@
 # Getting Started Guide
 
-Download the [`example`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/tree/main/example) folder with its contents, install this package using the Julia REPL and its package manager:
+Clone the repository with its contents, install this package using the Julia REPL and its package manager
 
+Terminal:
 ```
-(@v1.11) pkg> activate --temp
-(jl_dghlh5) pkg> add https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
-```
-
-and install all dependencies listed in [`Project.toml`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/blob/main/Project.toml):
-
-```
-BSON = "0.3.9"
-Flux = "0.16.4"
-ImageView = "0.12.6"
-Images = "0.26.2"
-MAT = "0.10.7"
-Random = "1.11.0"
-julia = "1.11"
+git clone https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
 ```
 
-Inside the downloaded `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the following sections:
+and make sure to install all dependencies listed in [`Project.toml`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/blob/main/Project.toml):
+
+Julia REPL:
+```
+(@v1.11) pkg> activate .
+(imageGenerationWithDiffusio...) pkg> instantiate
+```
+
+Inside the `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the later parts of this guide
 
 ```
 example/
@@ -38,44 +34,47 @@ as well as our base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/
 
 ### Visualizing the Noising Process
 
-![](/docs/Screenshot%202025-06-10%20at%2012.45.06.png)
+![](/docs/noising.png)
 
 Run `noising_example.jl` for a quick demo of how the noising is applied to images across different timesteps:
 
+Julia REPL:
 ```
-julia> include("noising_example.jl")
+julia> include("example/noising_example.jl")
 ```
 
 ### Training and Reverse Sampling
 
-You can train the model by yourself by adjusting the training variables:
+Run `train_example.jl` to execute the training script and see how the model predicts a digit from randomly generated noise:
 
+Julia REPL:
 ```
-# training variables
-learning_rate = 0.001
-epochs = 5
-batch_size = 32
-shuffle = true
+julia> include("example/train_example.jl")
 ```
 
-as well as the noising variables to your preferences. You can also choose between applying a linear or cosine noise schedule:
+You can train the model by yourself by adjusting the training parameters to your preferences
 
+`training.jl` Module:
 ```
-# noising variables
-num_timesteps = 100
-beta = imageGenerationWithDiffusionModels.cosine_beta_schedule(num_timesteps) # cosine schedule
-#beta =  LinRange(1e-4, 0.02, 100) # linear schedule
-alphaBar = cumprod(1 .- beta)
+train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
+    num_timesteps::Int = 100,
+    learning_rate::Real = 0.0001,
+    epochs::Int = 15,
+    batch_size::Int = 32,
+    shuffle::Bool = true,
+    model::unet = unet(
+        1,
+        5,
+        16,
+        LearnedTEmbedding(128),
+        128;
+        num_blocks_per_level=1
+    ))
 ```
 
 Alternatively you can use our pre-trained model `model.bson` by setting the `training` variable to `false`:
 
+`train_example.jl`:
 ```
 training = false
-```
-
-Run `train_example.jl` to execute the training script and see how the model predicts a digit from randomly generated noise:
-
-```
-julia> include("train_example.jl")
 ```
