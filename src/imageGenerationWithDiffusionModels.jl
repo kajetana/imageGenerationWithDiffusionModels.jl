@@ -128,6 +128,7 @@ export load_digits_data,
     cat_on_channel_dim,
     sinusoidal_embedding,
     cosine_beta_schedule,
-    make_down_path
+    make_down_path,
+    reverse_sample
 
 end

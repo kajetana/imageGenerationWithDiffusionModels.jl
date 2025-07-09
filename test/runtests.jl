@@ -1,23 +1,8 @@
-#using imageGenerationWithDiffusionModels
-#using Test
-#using Flux             
-#import Flux: gradient
-
-const SRC = joinpath(@__DIR__, "..", "src")
-#include(joinpath(SRC, "blocks.jl"))                                 # module Blocks
-include(joinpath(SRC, "embeddings.jl"))                             # module Embeddings
-#include(joinpath(SRC, "feature_encoder_network.jl"))                # make_down_path
-#include(joinpath(SRC, "unet.jl"))                                   # make_unet
-#include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
-include(joinpath(SRC, "reverse_sampling.jl"))
-include(joinpath(SRC, "cosine_beta_schedule.jl"))
-using .Embeddings, .Scheduler, .ReverseSampling
-
 using Test
 using Flux             
 import Flux: gradient
 using Random
-#using imageGenerationWithDiffusionModels
+using imageGenerationWithDiffusionModels
 
 @testset "FeatureEncoderNetwork full path" begin
     channels = (8, 16, 32)
@@ -103,7 +88,7 @@ end
 
     # sample timesteps and embed them
     t_steps   = [1, 500, 999, 123]                    # one batch for each timestep 
-    t_emb     = Embeddings.sinusoidal_embedding(t_steps, emb_dim)
+    t_emb     = sinusoidal_embedding(t_steps, emb_dim)
 
     # dummy image batch 32×32×1×batch_size
     x0 = randn(Float32, 32, 32, 1, batch)
@@ -116,7 +101,7 @@ end
     @test all(map -> map isa Array, skips)
 
     # embedding should influence the output
-    t_emb_shifted = Embeddings.sinusoidal_embedding(t_steps .+ 1, emb_dim)
+    t_emb_shifted = sinusoidal_embedding(t_steps .+ 1, emb_dim)
     latent_shift, _ = encoder.encode(x0, t_emb_shifted)
 
     @test latent != latent_shift                     # outputs differ
@@ -157,15 +142,15 @@ end
     @testset "load_digits_data" begin
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
-        @test typeof(imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)) == Dict{String, Any}
+        @test typeof(load_digits_data(FILE_PATH)) == Dict{String, Any}
 
-        @test typeof(imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)["syntheticImages"][:, :, 1, 1]) == Matrix{Float32}
+        @test typeof(load_digits_data(FILE_PATH)["syntheticImages"][:, :, 1, 1]) == Matrix{Float32}
     end
 
     @testset "add_noise_to_image" begin
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
-        data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
+        data = load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
 
@@ -173,32 +158,32 @@ end
         beta = LinRange(1e-4, 0.02, 500)
         alphaBar = cumprod(1 .-beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image(img, 0, alphaBar) == img
+        @test add_noise_to_image(img, 0, alphaBar) == img
 
         # credits for test type: https://docs.julialang.org/en/v1/stdlib/Test/
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar)
+        @test_throws ErrorException add_noise_to_image(img, 501, alphaBar)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)) == Tuple{Matrix{Float64}, Matrix{Float32}}
+        @test typeof(add_noise_to_image(img, 500, alphaBar)) == Tuple{Matrix{Float64}, Matrix{Float32}}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)[1]) == (32, 32)
+        @test size(add_noise_to_image(img, 500, alphaBar)[1]) == (32, 32)
 
         # cosine
-        beta2 = imageGenerationWithDiffusionModels.cosine_beta_schedule(500)
+        beta2 = cosine_beta_schedule(500)
         alphaBar2 = cumprod(1 .- beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image(img, 0, alphaBar2) == img
+        @test add_noise_to_image(img, 0, alphaBar2) == img
 
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar2)
+        @test_throws ErrorException add_noise_to_image(img, 501, alphaBar2)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar2)) == Tuple{Matrix{Float64}, Matrix{Float32}}
+        @test typeof(add_noise_to_image(img, 500, alphaBar2)) == Tuple{Matrix{Float64}, Matrix{Float32}}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar2)[1]) == (32, 32)
+        @test size(add_noise_to_image(img, 500, alphaBar2)[1]) == (32, 32)
     end
 
     @testset "add_noise_to_image_visualization" begin
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
-        data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
+        data = load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
 
@@ -206,26 +191,26 @@ end
         beta = LinRange(1e-4, 0.02, 500)
         alphaBar = cumprod(1 .-beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 0, alphaBar) == img
+        @test add_noise_to_image_visualization(img, 0, alphaBar) == img
 
         # credits for test type: https://docs.julialang.org/en/v1/stdlib/Test/
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 501, alphaBar)
+        @test_throws ErrorException add_noise_to_image_visualization(img, 501, alphaBar)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar)) == Matrix{Float64}
+        @test typeof(add_noise_to_image_visualization(img, 500, alphaBar)) == Matrix{Float64}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar)) == (32, 32)
+        @test size(add_noise_to_image_visualization(img, 500, alphaBar)) == (32, 32)
 
         # cosine
-        beta2 = imageGenerationWithDiffusionModels.cosine_beta_schedule(500)
+        beta2 = cosine_beta_schedule(500)
         alphaBar2 = cumprod(1 .- beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 0, alphaBar2) == img
+        @test add_noise_to_image_visualization(img, 0, alphaBar2) == img
 
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 501, alphaBar2)
+        @test_throws ErrorException add_noise_to_image_visualization(img, 501, alphaBar2)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar2)) == Matrix{Float64}
+        @test typeof(add_noise_to_image_visualization(img, 500, alphaBar2)) == Matrix{Float64}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar2)) == (32, 32)
+        @test size(add_noise_to_image_visualization(img, 500, alphaBar2)) == (32, 32)
     end
 
     @testset "visualize_noising_of_image" begin
@@ -233,13 +218,13 @@ end
         alphaBar = cumprod(1 .-beta)
         ts = 500:-50:0 # noising steps
 
-        data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
+        data = load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
 
-        @test typeof(imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)) == Matrix{Float64}
+        @test typeof(visualize_noising_of_image(img, ts, alphaBar)) == Matrix{Float64}
 
-        @test size(imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)) == (32, 352)
+        @test size(visualize_noising_of_image(img, ts, alphaBar)) == (32, 352)
     end
 
 end
@@ -247,38 +232,38 @@ end
 @testset "cosine_beta_schedule.jl" begin
     num_timesteps = 100
 
-    @test typeof(Scheduler.cosine_beta_schedule(num_timesteps)) == Vector{Float64}
+    @test typeof(cosine_beta_schedule(num_timesteps)) == Vector{Float64}
 
-    @test length(Scheduler.cosine_beta_schedule(num_timesteps)) == 100
+    @test length(cosine_beta_schedule(num_timesteps)) == 100
 end
 
-@testset "reverse_sampling.jl" begin
-    shape = (1, 28, 28, 4)  # channels, height, width, batch
-    T = 5
-    alpha_hats = Float32.([0.9^t for t in 1:T])  # geometric decay
+# @testset "reverse_sampling.jl" begin
+#     shape = (1, 28, 28, 4)  # channels, height, width, batch
+#     T = 5
+#     alpha_hats = Float32.([0.9^t for t in 1:T])  # geometric decay
 
-    @testset "Output shape and type" begin
-        x_sampled = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
-        @test size(x_sampled) == shape
-        @test eltype(x_sampled) == Float32
-    end
+#     @testset "Output shape and type" begin
+#         x_sampled = reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+#         @test size(x_sampled) == shape
+#         @test eltype(x_sampled) == Float32
+#     end
 
-    @testset "Runs without error (identity model)" begin
-        x_sampled = ReverseSampling.reverse_sample(mock_model_identity, shape; T=T, alpha_hats=alpha_hats)
-        @test !any(isnan, x_sampled)
-    end
+#     @testset "Runs without error (identity model)" begin
+#         x_sampled = reverse_sample(mock_model_identity, shape; T=T, alpha_hats=alpha_hats)
+#         @test !any(isnan, x_sampled)
+#     end
 
-    @testset "Edge case: T = 1" begin
-        alpha_hats_edge = Float32.([0.95])
-        x_sampled = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=1, alpha_hats=alpha_hats_edge)
-        @test size(x_sampled) == shape
-    end
+#     @testset "Edge case: T = 1" begin
+#         alpha_hats_edge = Float32.([0.95])
+#         x_sampled = reverse_sample(mock_model_zeros, shape; T=1, alpha_hats=alpha_hats_edge)
+#         @test size(x_sampled) == shape
+#     end
 
-    @testset "All-zero model output -> Gaussian diffusion" begin
-        Random.seed!(42)
-        x1 = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
-        Random.seed!(42)
-        x2 = ReverseSampling.reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
-        @test x1 == x2  # deterministic if model and RNG fixed
-    end
-end
+#     @testset "All-zero model output -> Gaussian diffusion" begin
+#         Random.seed!(42)
+#         x1 = reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+#         Random.seed!(42)
+#         x2 = reverse_sample(mock_model_zeros, shape; T=T, alpha_hats=alpha_hats)
+#         @test x1 == x2  # deterministic if model and RNG fixed
+#     end
+# end

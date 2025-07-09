@@ -6,30 +6,6 @@ using Flux
 using ImageView
 using BSON: @save, @load
 
-
-
-
-
-###############################################################################################################
-# creating the model
-#
-# credits: 
-# https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#forward-diffusion
-###############################################################################################################
-
-# in_channels::Int,
-# num_levels::Int,
-# model_dim::Int,
-# time_embed,
-# emb_dim::Int;
-# block_layer=TResBlock,
-# num_blocks_per_level::Int=1
-
-#in_channels = size(data, 3)
-
-
-
-
 function train(;FILE_PATH = "./example/SyntheticImages500.mat", 
     learning_rate = 0.0001,
     epochs = 15,
@@ -123,23 +99,6 @@ function train(;FILE_PATH = "./example/SyntheticImages500.mat",
     else
         @load "model.bson" model
     end 
-
-    ###############################################################################################################
-    # reverse sampling
-    ##############################################################################################################
-
-    x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=num_timesteps, alpha_hats=alphaBar)
-    
-    x = reshape(x, 32, 32)
-
-    img = rand(32,32)
-    gui = ImageView.imshow(img)
-    canvas = gui["gui"]["canvas"]
-
-    ImageView.imshow(canvas, x)
-    sleep(10.0)
-
-    ImageView.close(gui["gui"]["window"])
 end
 
 export train
