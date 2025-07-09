@@ -4,7 +4,7 @@ import Flux: gelu
 using ..Blocks: TResBlock, Downsample, ConditionalSkipConnection, Upsampling, ConditionalChain
 
 """
-make_down_path(; channels=(64,128,256), emb_dim=128, in_ch=1)
+    make_down_path(; channels=(64,128,256), emb_dim=128, in_ch=1)
 
 Returns a tuple (encode, out_channels).
 * encode(img, t_emb) : (latent, intermediates)

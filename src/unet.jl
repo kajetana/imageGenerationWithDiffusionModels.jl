@@ -28,13 +28,29 @@ function make_unet(; channels=(64,128,256), emb_dim=128, in_ch=1)
 
     return model
 end
-
+"""
+    unet{E,C<:ConditionalChain}
+Struct of the UNet Model.
+"""
 struct unet{E,C<:ConditionalChain}
     time_embedding::E
     chain::C
     num_levels::Int
 end
+"""
+    unet(
+        in_channels::Int,
+        num_levels::Int,
+        model_dim::Int,
+        time_embed,
+        emb_dim::Int;
+        block_layer=TResBlock,
+        num_blocks_per_level::Int=1,
+    )
+Constructs a UNet Model.
 
+The depth of the Model is parametrized by `num_levels`. `time_embed` is a time embedding block with an output length `emb_dim`.
+"""
 function unet(
         in_channels::Int,
         num_levels::Int,
@@ -60,6 +76,12 @@ function unet(
     )
     unet(time_embed, chain, num_levels)
 end
+"""
+    (u::unet)(x::AbstractArray, timesteps::AbstractVector)
+Forward pass for the UNet model.
+
+Usually takes an Image in form of a Vector and a timestep as inputs and returns an Image in form of a vector.
+"""
 function (u::unet)(x::AbstractArray, timesteps::AbstractVector)
     emb = u.time_embedding(timesteps)
     h = u.chain(x, emb)
