@@ -141,7 +141,7 @@ function train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     println("Training finished!")
 
     # Save the model
-    @save ".example/model.bson" model
+    @save joinpath(@__DIR__, "", "model.bson") model
 
     return model
 end

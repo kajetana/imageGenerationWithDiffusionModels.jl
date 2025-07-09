@@ -237,6 +237,20 @@ end
     @test length(cosine_beta_schedule(num_timesteps)) == 100
 end
 
+@testset "training.jl" begin
+    FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
+
+    model = train(num_timesteps=1, batch_size=500, epochs=1, FILE_PATH=FILE_PATH)
+
+    # linear
+    #model2 = train(num_timesteps=1, batch_size=500, epochs=1, cosine=false)
+
+    @test typeof(model) == unet{LearnedTEmbedding, ConditionalChain{@NamedTuple{init::Flux.Conv{2, 2, typeof(identity), Array{Float32, 4}, Vector{Float32}}, down_1::TResBlock, skip_1::ConditionalSkipConnection{ConditionalChain{@NamedTuple{downsample_1::Flux.MaxPool{2, 4}, down_2::TResBlock, skip_2::ConditionalSkipConnection{ConditionalChain{@NamedTuple{downsample_2::Flux.MaxPool{2, 4}, down_3::TResBlock, skip_3::ConditionalSkipConnection{ConditionalChain{@NamedTuple{downsample_3::Flux.MaxPool{2, 4}, down_4::TResBlock, skip_4::ConditionalSkipConnection{ConditionalChain{@NamedTuple{downsample_5::Flux.MaxPool{2, 4}, middle::TResBlock, upsample_5::Flux.Chain{Tuple{Flux.Upsample{:nearest, Tuple{Int64, Int64}, Nothing}, Flux.Conv{2, 4, typeof(identity), Array{Float32, 4}, Vector{Float32}}}}}}, typeof(cat_on_channel_dim)}, up_4::TResBlock, upsample_4::Flux.Chain{Tuple{Flux.Upsample{:nearest, Tuple{Int64, Int64}, Nothing}, Flux.Conv{2, 4, typeof(identity), Array{Float32, 4}, Vector{Float32}}}}}}, typeof(cat_on_channel_dim)}, up_3::TResBlock, upsample_3::Flux.Chain{Tuple{Flux.Upsample{:nearest, Tuple{Int64, Int64}, Nothing}, Flux.Conv{2, 4, typeof(identity), Array{Float32, 4}, Vector{Float32}}}}}}, typeof(cat_on_channel_dim)}, up_2::TResBlock, upsample_2::Flux.Chain{Tuple{Flux.Upsample{:nearest, Tuple{Int64, Int64}, Nothing}, Flux.Conv{2, 4, typeof(identity), Array{Float32, 4}, Vector{Float32}}}}}}, typeof(cat_on_channel_dim)}, up_1::TResBlock, final::Flux.Conv{2, 2, typeof(identity), Array{Float32, 4}, Vector{Float32}}}}}
+
+    # credits: https://www.jlhub.com/julia/manual/en/function/isfile
+    #@test isfile(joinpath(@__DIR__, "model.bson"))
+end
+
 # @testset "reverse_sampling.jl" begin
 #     shape = (1, 28, 28, 4)  # channels, height, width, batch
 #     T = 5

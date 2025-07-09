@@ -15,8 +15,11 @@ This Julia package implements a diffusion model to generate images of digits. It
 Modules = [
     imageGenerationWithDiffusionModels,
     imageGenerationWithDiffusionModels.FeatureEncoderNetwork,
+    imageGenerationWithDiffusionModels.Blocks,
     imageGenerationWithDiffusionModels.Scheduler,
     imageGenerationWithDiffusionModels.Embeddings,
-    imageGenerationWithDiffusionModels.UNet
+    imageGenerationWithDiffusionModels.UNet,
+    imageGenerationWithDiffusionModels.Training,
+    imageGenerationWithDiffusionModels.ReverseSampling
 ]
 ```
