@@ -3,12 +3,7 @@
 # include("reverse_sampling.jl")
 
 using Flux
-using ImageView
 using BSON: @save, @load
-
-
-
-
 
 ###############################################################################################################
 # creating the model
@@ -122,26 +117,7 @@ function train(;FILE_PATH = "./example/SyntheticImages500.mat",
         @save "model.bson" model
     else
         @load "model.bson" model
-    end 
-
-    ###############################################################################################################
-    # reverse sampling
-    ##############################################################################################################
-
-    x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=num_timesteps, alpha_hats=alphaBar)
-    
-    x = reshape(x, 32, 32)
-
-    # temp fix
-
-    # img = rand(32,32)
-    # gui = ImageView.imshow(img)
-    # canvas = gui["gui"]["canvas"]
-
-    # ImageView.imshow(canvas, x)
-    # sleep(10.0)
-
-    # ImageView.close(gui["gui"]["window"])
+    end
 end
 
 export train

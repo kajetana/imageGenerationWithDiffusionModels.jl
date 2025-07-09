@@ -1,12 +1,12 @@
 using imageGenerationWithDiffusionModels
 
 using Flux
-using ImageView
 using BSON: @save, @load
 using Statistics
 import imageGenerationWithDiffusionModels.ReverseSampling
 using FileIO, PNGFiles
 using Images
+
 ###############################################################################################################
 # loading and preprocessing data
 #
@@ -126,34 +126,17 @@ end
 # reverse sampling
 ##############################################################################################################
 
-#Reverse sampling file save
-
 # sample one greyscale image with the UNet
 x = ReverseSampling.reverse_sample(model,
                                    (32,32,1,1);     
                                    T = 100,
                                    alpha_hats = alphaBar)
 
-x = reshape(x, 32, 32)
+x = reshape(x, 32, 32) # remove additional batch dimensions
+
 x = (x .- minimum(x)) ./ (maximum(x) - minimum(x))    # now in [0,1]
 img_rgb = RGB.(x, x, x) # 32×32 Array{RGB}
 
-save("reverse_sample.png", img)
+save("reverse_sample.png", img_rgb)
 println("wrote reverse_sample.png")
  
-
-# Reverse sampling window display
-
-#x = ReverseSampling.reverse_sample(model, (32, 32, 1, 1), T=100, alpha_hats=alphaBar)
-#print(size(x))
-
-#x = reshape(x, 32, 32)
-
-#img = rand(32,32)
-#gui = ImageView.imshow(img)
-#canvas = gui["gui"]["canvas"]
-
-#ImageView.imshow(canvas, x)
-#sleep(8.0)
-
-#ImageView.close(gui["gui"]["window"])
