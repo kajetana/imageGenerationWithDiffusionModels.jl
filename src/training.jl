@@ -102,7 +102,6 @@ function train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
         
         for (batch_idx, batch) in enumerate(training_data)
             batch = batch[1]
-
             imgs = similar(batch)
             noise = similar(batch)
 

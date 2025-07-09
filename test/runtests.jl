@@ -142,15 +142,15 @@ end
     @testset "load_digits_data" begin
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
-        @test typeof(imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)) == Dict{String, Any}
+        @test typeof(load_digits_data(FILE_PATH)) == Dict{String, Any}
 
-        @test typeof(imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)["syntheticImages"][:, :, 1, 1]) == Matrix{Float32}
+        @test typeof(load_digits_data(FILE_PATH)["syntheticImages"][:, :, 1, 1]) == Matrix{Float32}
     end
 
     @testset "add_noise_to_image" begin
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
-        data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
+        data = load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
 
@@ -158,32 +158,32 @@ end
         beta = LinRange(1e-4, 0.02, 500)
         alphaBar = cumprod(1 .-beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image(img, 0, alphaBar) == img
+        @test add_noise_to_image(img, 0, alphaBar) == img
 
         # credits for test type: https://docs.julialang.org/en/v1/stdlib/Test/
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar)
+        @test_throws ErrorException add_noise_to_image(img, 501, alphaBar)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)) == Tuple{Matrix{Float64}, Matrix{Float32}}
+        @test typeof(add_noise_to_image(img, 500, alphaBar)) == Tuple{Matrix{Float64}, Matrix{Float32}}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar)[1]) == (32, 32)
+        @test size(add_noise_to_image(img, 500, alphaBar)[1]) == (32, 32)
 
         # cosine
-        beta2 = imageGenerationWithDiffusionModels.cosine_beta_schedule(500)
+        beta2 = cosine_beta_schedule(500)
         alphaBar2 = cumprod(1 .- beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image(img, 0, alphaBar2) == img
+        @test add_noise_to_image(img, 0, alphaBar2) == img
 
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image(img, 501, alphaBar2)
+        @test_throws ErrorException add_noise_to_image(img, 501, alphaBar2)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar2)) == Tuple{Matrix{Float64}, Matrix{Float32}}
+        @test typeof(add_noise_to_image(img, 500, alphaBar2)) == Tuple{Matrix{Float64}, Matrix{Float32}}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image(img, 500, alphaBar2)[1]) == (32, 32)
+        @test size(add_noise_to_image(img, 500, alphaBar2)[1]) == (32, 32)
     end
 
     @testset "add_noise_to_image_visualization" begin
         FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
 
-        data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
+        data = load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
 
@@ -191,26 +191,26 @@ end
         beta = LinRange(1e-4, 0.02, 500)
         alphaBar = cumprod(1 .-beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 0, alphaBar) == img
+        @test add_noise_to_image_visualization(img, 0, alphaBar) == img
 
         # credits for test type: https://docs.julialang.org/en/v1/stdlib/Test/
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 501, alphaBar)
+        @test_throws ErrorException add_noise_to_image_visualization(img, 501, alphaBar)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar)) == Matrix{Float64}
+        @test typeof(add_noise_to_image_visualization(img, 500, alphaBar)) == Matrix{Float64}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar)) == (32, 32)
+        @test size(add_noise_to_image_visualization(img, 500, alphaBar)) == (32, 32)
 
         # cosine
-        beta2 = imageGenerationWithDiffusionModels.cosine_beta_schedule(500)
+        beta2 = cosine_beta_schedule(500)
         alphaBar2 = cumprod(1 .- beta)
 
-        @test imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 0, alphaBar2) == img
+        @test add_noise_to_image_visualization(img, 0, alphaBar2) == img
 
-        @test_throws ErrorException imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 501, alphaBar2)
+        @test_throws ErrorException add_noise_to_image_visualization(img, 501, alphaBar2)
 
-        @test typeof(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar2)) == Matrix{Float64}
+        @test typeof(add_noise_to_image_visualization(img, 500, alphaBar2)) == Matrix{Float64}
     
-        @test size(imageGenerationWithDiffusionModels.add_noise_to_image_visualization(img, 500, alphaBar2)) == (32, 32)
+        @test size(add_noise_to_image_visualization(img, 500, alphaBar2)) == (32, 32)
     end
 
     @testset "visualize_noising_of_image" begin
@@ -218,13 +218,13 @@ end
         alphaBar = cumprod(1 .-beta)
         ts = 500:-50:0 # noising steps
 
-        data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)
+        data = load_digits_data(FILE_PATH)
         images = data["syntheticImages"]
         img = images[:, :, 1, 1]
 
-        @test typeof(imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)) == Matrix{Float64}
+        @test typeof(visualize_noising_of_image(img, ts, alphaBar)) == Matrix{Float64}
 
-        @test size(imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)) == (32, 352)
+        @test size(visualize_noising_of_image(img, ts, alphaBar)) == (32, 352)
     end
 
 end
@@ -250,6 +250,7 @@ end
     # credits: https://www.jlhub.com/julia/manual/en/function/isfile
     #@test isfile(joinpath(@__DIR__, "model.bson"))
 end
+
 
 # @testset "reverse_sampling.jl" begin
 #     shape = (1, 28, 28, 4)  # channels, height, width, batch
