@@ -17,6 +17,8 @@ using .Scheduler
 include("reverse_sampling.jl")
 using .ReverseSampling
 include("training.jl")
+using .Training
+
 """
     load_digits_data(filepath::String)
 
@@ -130,5 +132,4 @@ export load_digits_data,
     cosine_beta_schedule,
     make_down_path,
     reverse_sample
-
 end
