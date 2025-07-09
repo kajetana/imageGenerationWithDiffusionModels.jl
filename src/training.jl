@@ -50,7 +50,6 @@ function train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     batch_size::Int = 32,
     shuffle::Bool = true,
     model::unet = unet(
-        main
         1,
         5,
         16,
