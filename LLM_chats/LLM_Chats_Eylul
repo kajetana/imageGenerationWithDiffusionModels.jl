@@ -1,0 +1,64 @@
+Questions & Snippets from the debugging session
+
+1.  **Are skip‑maps used here?**
+    ```julia
+    function make_down_path(; channels=(64,128,256), emb_dim=128, in_ch=1)
+        ...
+    end
+    ```
+
+2.  **Is up‑sampling decoding?**
+
+3.  **Why do I have this error?**  
+    (DimensionMismatch in `Conv((3,3), 1 => 64, pad=1)`)
+
+4.  **What is `ConditionalSkipConnection` doing?**
+
+5.  **Write the resolution and channel size for each step of this code**  
+    (asked for `_add_unet_level` traversal)
+
+6.  **What is the purpose of `cosine_beta_schedule`?**  
+    ```julia
+    function cosine_beta_schedule(num_timesteps::Int, s=0.008)
+        ...
+    end
+    ```
+
+7.  **How would training look like?**  
+    (high‑level description of dataloader, optimiser, epochs)
+
+8.  **Rewrite `encode` so it no longer calls `push!`**  
+    ```julia
+    function encode(img, t_emb)
+        num_levels   = length(down_blocks)
+        intermediates = Vector{Any}(undef, num_levels)
+        ...
+    end
+    ```
+
+9.  **Save the reverse‑sampled image without corruption**  
+    ```julia
+    img2d = Gray.(clamp01.(g))
+    save("reverse_sample.png", img2d)
+    ```
+
+10. **Linear vs Cosine β‑schedule – which one am I using?**
+
+11. **Is this a good output?**  
+    (displayed blurry 32×32 greyscale square)
+
+12. **Expected appearance at different training stages**  
+    – noise → blurry blob → clear MNIST digit.
+
+13. **How can I extract the 5‑th image from a 4‑D batch?**  
+    ```julia
+    g = view(batch, :, :, :, 5)   # H×W×C slice
+    ```
+
+14. **Shape contract of `reverse_sample`**  
+    ```julia
+    reverse_sample(model,  (H,W,C,B); T, alpha_hats) ->  (H,W,C,B)
+    ```
+
+15. **Unit‑test file (`test_blocks_unet.jl`)**  
+    – extra coverage for Blocks, FeatureEncoderNetwork, UNet, Scheduler.
