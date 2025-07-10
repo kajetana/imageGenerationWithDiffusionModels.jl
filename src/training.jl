@@ -52,10 +52,10 @@ function train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     model::unet = unet(
         1,
         5,
-        16,
-        LearnedTEmbedding(128),
-        128;
-        num_blocks_per_level=1
+        32, #16 -> 32
+        LearnedTEmbedding(256), #128 -> 256
+        256; #128 -> 256
+        num_blocks_per_level=2
     ))
     
     ###############################################################################################################

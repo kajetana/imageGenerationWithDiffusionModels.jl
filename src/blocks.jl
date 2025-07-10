@@ -34,6 +34,7 @@ Forward pass for the `TResBlock`.
 A `SkipConnection` skips over two convolution layers. `x` is the layer input and t_emb in added to the feature maps as a bias after the first convolution.
 See also `Flux.SkipConnection`, `Flux.Conv`
 """
+"""
 function (m::TResBlock)(x, t_emb)
     #@info "Feature shape before failing conv: ", size(x)
     h = gelu.(m.conv1(x))
@@ -42,6 +43,24 @@ function (m::TResBlock)(x, t_emb)
     h  = gelu.(m.conv2(h))
     return h .+ (m.skip === identity ? x : m.skip(x))
 end
+"""
+
+function (m::TResBlock)(x, t_emb)
+    #@info "Feature shape before failing conv: ", size(x)
+    h = m.conv1(x)
+    h = Flux.GroupNorm(8, size(h, 3))(h)  # group norm after conv1
+    h = gelu.(h)
+    # broadcast time embedding to (1,1,C,B) and add
+
+    h = h .+ reshape(m.emb_proj(t_emb), 1, 1, size(h, 3), size(h, 4))
+
+    h = m.conv2(h)
+    h = Flux.GroupNorm(8, size(h, 3))(h)  # group norm after conv2
+    h = gelu.(h)
+
+    return h .+ (m.skip === identity ? x : m.skip(x))
+end
+
 
 # 2× down-sampling (MaxPool) helper
 """
