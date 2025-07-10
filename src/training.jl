@@ -75,7 +75,7 @@ function train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     if cosine
         beta = cosine_beta_schedule(num_timesteps) # cosine schedule
     else
-        beta = LinRange(1e-4, 0.02, 100) # linear schedule
+        beta = LinRange(1e-4, 0.02, num_timesteps) # linear schedule
     end
     
     alphaBar = cumprod(1 .- beta)

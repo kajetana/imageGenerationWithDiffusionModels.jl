@@ -1,9 +1,8 @@
 module imageGenerationWithDiffusionModels
 
 using MAT
-using Images
 using Random
-using Flux
+
 include("embeddings.jl")
 using .Embeddings
 include("blocks.jl")
@@ -38,15 +37,15 @@ end
 Applies Gaussian noise to an image.
 
 # Arguments
-- `img::Matrix{Float32}` : Input image
+- `img` : Input image
 - `noise_step::Int64` : A noising step
 - `alpha_bar::Vector{Float64}` : Vector of noise parameters. Length must be at least "noise_step". Comupted by taking the Cumulative product of (1-"variance schedule")
 - `rng::Random.TaskLocalRNG`: Random number generator. Defaults to: `Random.GLOBAL_RNG`.
 
 # Returns
-A noised version of image and the applied noise
+A noised version of image in form of a matrix and the applied noise.
 """
-function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
+function add_noise_to_image(img, noise_step::Int64, alpha_bar::Vector{Float64}, rng = Random.GLOBAL_RNG)
     if noise_step == 0
         return img
     end
@@ -54,6 +53,8 @@ function add_noise_to_image(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
     if noise_step > length(alpha_bar)
         error()
     end
+
+    convert.(eltype(img), alpha_bar)
     
     sqrtOneMinusalphaBar = sqrt(1 - alpha_bar[noise_step])                        # amount of noise        
     z = randn(rng, eltype(img), size(img))                                        # noise
@@ -65,9 +66,9 @@ end
 ###############################################################################################################
 
 """
-    add_noise_to_image_visualization(img::Vector{Float64}, noise_step::Int64, alpha_bar::Vector{Float64}; rng = Random.GLOBAL_RNG)
+    add_noise_to_image_visualization(img, noise_step::Int64, alpha_bar::Vector{Float64}; rng = Random.GLOBAL_RNG)
 
-Applies Gaussian noise to an image.
+Applies Gaussian noise to an image. Utility function purely for visualization purposes.
 
 # Arguments
 - `img::Matrix{Float32}` : Input image
@@ -76,9 +77,9 @@ Applies Gaussian noise to an image.
 - `rng::Random.TaskLocalRNG`: Random number generator. Defaults to: `Random.GLOBAL_RNG`.
 
 # Returns
-A noised version of image
+A noised version of image in form of a matrix.
 """
-function add_noise_to_image_visualization(img, noise_step, alpha_bar, rng = Random.GLOBAL_RNG)
+function add_noise_to_image_visualization(img, noise_step::Int64, alpha_bar::Vector{Float64}, rng::Random.TaskLocalRNG = Random.GLOBAL_RNG)
     if noise_step == 0
         return img
     end

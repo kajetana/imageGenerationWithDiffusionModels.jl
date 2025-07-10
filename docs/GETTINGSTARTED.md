@@ -1,6 +1,6 @@
 # Getting Started Guide
 
-Clone the repository with its contents, install this package using the Julia REPL and its package manager
+Clone the repository with its contents:
 
 _Terminal:_
 ```
@@ -15,7 +15,7 @@ _Julia REPL:_
 (imageGenerationWithDiffusio...) pkg> instantiate
 ```
 
-Inside the `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the later parts of this guide
+Inside the `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the later parts of this guide:
 
 ```
 example/
@@ -43,6 +43,19 @@ _Julia REPL:_
 julia> include("example/noising_example.jl")
 ```
 
+Toggle between cosine and linear schedule by changing the `cosine` variable to see the difference in the noising application:
+
+_noising_example.jl_
+```
+cosine = true
+
+if cosine
+    beta = cosine_beta_schedule(num_timesteps) # cosine schedule
+else
+    beta = LinRange(1e-4, 0.02, num_timesteps) # linear schedule
+end
+```
+
 ### Training and Reverse Sampling
 
 Run `train_example.jl` to execute the training script and see how the model predicts a digit from randomly generated noise:
@@ -52,12 +65,13 @@ _Julia REPL:_
 julia> include("example/train_example.jl")
 ```
 
-You can train the model by yourself by adjusting the training parameters to your preferences
+You can train the model by yourself by adjusting the training parameters to your preferences:
 
 _training.jl:_
 ```
 train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     num_timesteps::Int = 100,
+    cosine::Bool = true,
     learning_rate::Real = 0.0001,
     epochs::Int = 15,
     batch_size::Int = 32,
@@ -77,4 +91,10 @@ Alternatively you can use our pre-trained model `model.bson` by setting the `tra
 _train_example.jl:_
 ```
 training = false
+
+if training
+    model = train(num_timesteps=num_timesteps)
+else
+    @load "./example/model.bson" model
+end
 ```

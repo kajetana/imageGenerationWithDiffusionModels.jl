@@ -5,15 +5,26 @@ using Images
 # noising variables
 ###############################################################################################################
 
-const FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
-beta =  LinRange(1e-4, 0.02, 500)  # posterior variance
+num_timesteps = 500
+
+cosine = false
+
+if cosine
+    beta = cosine_beta_schedule(num_timesteps) # cosine schedule
+else
+    beta = LinRange(1e-4, 0.02, num_timesteps) # linear schedule
+end
+
 alphaBar = cumprod(1 .-beta)
-ts = 500:-50:0 # noising steps
-data = imageGenerationWithDiffusionModels.load_digits_data(FILE_PATH)  # Explicitly reference the module 
+
+ts = num_timesteps:-50:0 # noising steps
 
 ###############################################################################################################
 # displaying the noising process
 ###############################################################################################################
+
+const FILE_PATH = joinpath(@__DIR__, "", "SyntheticImages500.mat")
+data = load_digits_data(FILE_PATH)
 
 images = data["syntheticImages"]
 
@@ -21,9 +32,10 @@ images = data["syntheticImages"]
 for i in 1:3
     img = images[:, :, 1, i]
 
-    img = imageGenerationWithDiffusionModels.visualize_noising_of_image(img, ts, alphaBar)
+    img = visualize_noising_of_image(img, ts, alphaBar)
 
-    img = (img .- minimum(img)) ./ (maximum(img) - minimum(img)) 
+    img = (img .- minimum(img)) ./ (maximum(img) - minimum(img)) # now in [0,1]
     img = RGB.(img, img, img) # 32×32 Array{RGB}
-    save("test" * string(i) * ".png", img)
+
+    save("noising" * string(i) * ".png", img)
 end

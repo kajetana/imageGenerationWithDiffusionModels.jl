@@ -26,7 +26,7 @@ alphaBar = cumprod(1 .- beta)
 #sample one greyscale image with the UNet
 img = ReverseSampling.reverse_sample(model,
                                    (32,32,1,1);     
-                                   T = 100,
+                                   T = num_timesteps,
                                    alpha_hats = alphaBar)
 
 img = reshape(img, 32, 32) # remove additional batch dimensions
