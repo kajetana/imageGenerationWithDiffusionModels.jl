@@ -51,3 +51,5 @@ to see some use cases including visualization of the noising process as well as 
 > "DenoisingDiffusion.jl" GitHub Repository by Lior Sinai (https://github.com/LiorSinai/DenoisingDiffusion.jl)
 
 > "DDPM" GitHub Repository by ytdeepia (https://github.com/ytdeepia/DDPM)
+
+> "Generate Images Using Diffusion" Example by MatLab (https://de.mathworks.com/help/deeplearning/ug/generate-images-using-diffusion.html)
