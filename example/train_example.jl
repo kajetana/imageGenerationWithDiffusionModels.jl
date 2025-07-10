@@ -8,7 +8,7 @@ using BSON: @load
 
 # Training
 
-num_timesteps = 500 # for recreating alpha bar in terms of reverese sampling
+num_timesteps = 100 # for recreating alpha bar in terms of reverese sampling
 
 training = false
 
