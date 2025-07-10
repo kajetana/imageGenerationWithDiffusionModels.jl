@@ -39,3 +39,5 @@ for i in 1:3
 
     save("noising" * string(i) * ".png", img)
 end
+
+println("Images generated!")

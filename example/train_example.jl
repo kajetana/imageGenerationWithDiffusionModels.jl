@@ -33,5 +33,5 @@ img = reshape(img, 32, 32) # remove additional batch dimensions
 img = (img .- minimum(img)) ./ (maximum(img) - minimum(img)) # now in [0,1]
 img = RGB.(img, img, img) # 32×32 Array{RGB}
 
-save("./example/reverse_sample.png", img)
+save("reverse_sample.png", img)
 println("Image generated and saved!")

@@ -1,16 +1,19 @@
 # Getting Started Guide
 
-Clone the repository with its contents:
+Clone the repository with its contents
 
 _Terminal:_
 ```
-git clone https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
+> git clone https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
+> cd imageGenerationWithDiffusionModels.jl
+> julia
 ```
 
 and make sure to install all dependencies listed in [`Project.toml`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/blob/main/Project.toml):
 
 _Julia REPL:_
 ```
+julia>]
 (@v1.11) pkg> activate .
 (imageGenerationWithDiffusio...) pkg> instantiate
 ```
