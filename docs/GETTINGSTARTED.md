@@ -13,6 +13,7 @@ and make sure to install all dependencies listed in [`Project.toml`](https://git
 
 _Julia REPL:_
 ```
+julia>]
 (@v1.11) pkg> activate .
 (imageGenerationWithDiffusio...) pkg> instantiate
 ```
