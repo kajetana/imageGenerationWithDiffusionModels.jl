@@ -2,14 +2,14 @@
 
 Clone the repository with its contents, install this package using the Julia REPL and its package manager
 
-Terminal:
+_Terminal:_
 ```
 git clone https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
 ```
 
 and make sure to install all dependencies listed in [`Project.toml`](https://github.com/kajetana/imageGenerationWithDiffusionModels.jl/blob/main/Project.toml):
 
-Julia REPL:
+_Julia REPL:_
 ```
 (@v1.11) pkg> activate .
 (imageGenerationWithDiffusio...) pkg> instantiate
@@ -38,7 +38,7 @@ as well as our base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/
 
 Run `noising_example.jl` for a quick demo of how the noising is applied to images across different timesteps:
 
-Julia REPL:
+_Julia REPL:_
 ```
 julia> include("example/noising_example.jl")
 ```
@@ -47,14 +47,14 @@ julia> include("example/noising_example.jl")
 
 Run `train_example.jl` to execute the training script and see how the model predicts a digit from randomly generated noise:
 
-Julia REPL:
+_Julia REPL:_
 ```
 julia> include("example/train_example.jl")
 ```
 
 You can train the model by yourself by adjusting the training parameters to your preferences
 
-`training.jl` Module:
+_training.jl:_
 ```
 train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     num_timesteps::Int = 100,
@@ -74,7 +74,7 @@ train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
 
 Alternatively you can use our pre-trained model `model.bson` by setting the `training` variable to `false`:
 
-`train_example.jl`:
+_train_example.jl:_
 ```
 training = false
 ```
