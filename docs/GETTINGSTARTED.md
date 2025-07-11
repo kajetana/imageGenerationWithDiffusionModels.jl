@@ -2,8 +2,13 @@
 
 Clone the repository with its contents
 
+This repo uses [Git Large File Storage (LFS)](https://git-lfs.github.com) for files like `model.bson`.
+
+To make sure these files are downloaded correctly:
+
 _Terminal:_
 ```
+> git lfs install
 > git clone https://github.com/kajetana/imageGenerationWithDiffusionModels.jl
 > cd imageGenerationWithDiffusionModels.jl
 > julia
