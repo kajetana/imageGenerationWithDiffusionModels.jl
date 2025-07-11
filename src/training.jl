@@ -142,7 +142,7 @@ function train(;FILE_PATH::String = "./example/SyntheticImages500.mat",
     # Save the model
     @save joinpath(@__DIR__, "", "model.bson") model
 
-    return model
+    return model, losses
 end
 
 export train
