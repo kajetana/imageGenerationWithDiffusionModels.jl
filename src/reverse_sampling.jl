@@ -31,9 +31,9 @@ function reverse_sample(model, shape::NTuple{2,Int};T::Int,
 
         coef1 = 1 / sqrt(α)
         coef2 = β / sqrt(1 - α_hat)
-        #mean = coef1 * (x_t - coef2 * eps_pred)
+        mean = coef1 * (x_t - coef2 * eps_pred)
 
-        mean = (x_t - sqrt(1 - α) * eps_pred) / sqrt(α)
+        #mean = (x_t - sqrt(1 - α) * eps_pred) / sqrt(α)
 
         if t > 1
             σ = sqrt(β)
