@@ -1,43 +1,49 @@
 module ReverseSampling
 using Flux
 using Random
+using ImageView
 
-function reverse_sample(model, shape::NTuple{4,Int};
-    T::Int,
-    alpha_hats::AbstractVector,)
-
-    # Derive alphas and betas from alpha_hats
-    alphas = similar(alpha_hats)
-    alphas[1] = alpha_hats[1]
-    for t in 2:T
-        alphas[t] = alpha_hats[t] / alpha_hats[t-1]
-    end
-    betas = 1 .- alphas
+function reverse_sample(model, shape::NTuple{2,Int};T::Int,
+    alpha_hats::Vector{Float64}, beta_schedule::Vector{Float64}, alphas::Vector{Float64},
+    noisy_image::Matrix{Float32} = nothing, noises::Vector{Matrix{Float32}} = nothing,
+    istest::Bool = false
+)
 
     # Start from Gaussian noise
-    x_t = randn(Float32, shape)
+    if noisy_image == nothing
+        x_t = randn(Float32, shape)
+    else
+        x_t = noisy_image
+    end
 
     for t in T:-1:1
-        batch = shape[end]
-        t_vec = fill(Int(t), batch)
 
-        eps_pred = model(x_t, t_vec)
 
-        β = betas[t]
+        if istest
+            eps_pred = noises[t]
+        else
+            eps_pred = model(x_t, t_vec)
+        end
+
+        β = beta_schedule[t]
         α = alphas[t]
         α_hat = alpha_hats[t]
 
         coef1 = 1 / sqrt(α)
         coef2 = β / sqrt(1 - α_hat)
-        mean = coef1 .* (x_t .- coef2 .* eps_pred)
+        mean = coef1 * (x_t - coef2 * eps_pred)
 
         if t > 1
             σ = sqrt(β)
             noise = randn(Float32, shape)
-            x_t = mean .+ σ .* noise
+             x_t = mean .+ σ .* noise
         else
             x_t = mean
         end
+        x_t = mean
+
+        #ImageView.imshow(x_t) 
+
     end
 
     return x_t

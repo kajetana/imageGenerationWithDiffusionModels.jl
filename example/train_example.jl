@@ -67,8 +67,9 @@ shuffle = true
 # noising variables
 num_timesteps = 100
 #beta = imageGenerationWithDiffusionModels.cosine_beta_schedule(num_timesteps) # cosine schedule
-beta =  LinRange(1e-4, 0.02, 100) # linear schedule
+beta =  collect(LinRange(1e-4, 0.02, 100)) # linear schedule
 alphaBar = cumprod(1 .- beta)
+alphas = 1 .- beta
 
 # optimizer
 optimizer = Flux.setup(Adam(learning_rate), model)
@@ -76,7 +77,7 @@ optimizer = Flux.setup(Adam(learning_rate), model)
 # training set, no classification, unsupervised training
 training_data = Flux.DataLoader((data, ), batchsize=batch_size, shuffle=shuffle)
 
-training = false
+training = true
 
 if training
     losses = Float32[]
@@ -128,13 +129,19 @@ end
 
 #Reverse sampling file save
 
-# sample one greyscale image with the UNet
-x = ReverseSampling.reverse_sample(model,
-                                   (32,32,1,1);     
-                                   T = 100,
-                                   alpha_hats = alphaBar)
+shape = (32, 32)  # Shape of the image
 
-x = reshape(x, 32, 32)
+# Call the reverse_sample function
+x = ReverseSampling.reverse_sample(
+    model,
+    shape;
+    T = 100,
+    alpha_hats = alphaBar,
+    beta_schedule = beta,
+    alphas = alphas,
+    istest = false  # Not in test mode
+)
+
 x = (x .- minimum(x)) ./ (maximum(x) - minimum(x))    # now in [0,1]
 img_rgb = RGB.(x, x, x) # 32×32 Array{RGB}
 

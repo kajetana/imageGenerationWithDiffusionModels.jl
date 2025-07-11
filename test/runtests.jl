@@ -11,7 +11,7 @@ include(joinpath(SRC, "embeddings.jl"))                             # module Emb
 #include(joinpath(SRC, "imageGenerationWithDiffusionModels.jl"))
 include(joinpath(SRC, "reverse_sampling.jl"))
 include(joinpath(SRC, "cosine_beta_schedule.jl"))
-using .Embeddings, .Scheduler, .ReverseSampling
+using .Embeddings, .Scheduler, .ReverseSampling, .imageGenerationWithDiffusionModels
 
 using Test
 using Flux             
