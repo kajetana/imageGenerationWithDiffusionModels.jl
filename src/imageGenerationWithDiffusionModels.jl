@@ -32,20 +32,20 @@ function load_digits_data(filepath::String)
 end
 
 """
-    add_noise_to_image(img::Vector{Float64}, noise_step::Int64, alpha_bar::Vector{Float64}; rng = Random.GLOBAL_RNG)
+    add_noise_to_image(img::AbstractArray, noise_step::Int, alpha_bar::AbstractVector, rng = Random.GLOBAL_RNG)
 
-Applies Gaussian noise to an image.
+Applies Gaussian noise to an image and returns it.
 
 # Arguments
-- `img` : Input image
-- `noise_step::Int64` : A noising step
-- `alpha_bar::Vector{Float64}` : Vector of noise parameters. Length must be at least "noise_step". Comupted by taking the Cumulative product of (1-"variance schedule")
+- `img::AbstractArray` : Input image
+- `noise_step::Int` : A noising step
+- `alpha_bar::AbstractVector` : Vector of noise parameters. Length must be at least "noise_step". Comupted by taking the Cumulative product of (1-"variance schedule")
 - `rng::Random.TaskLocalRNG`: Random number generator. Defaults to: `Random.GLOBAL_RNG`.
 
 # Returns
 A noised version of image in form of a matrix and the applied noise.
 """
-function add_noise_to_image(img, noise_step::Int64, alpha_bar::Vector{Float64}, rng = Random.GLOBAL_RNG)
+function add_noise_to_image(img::AbstractArray, noise_step::Int, alpha_bar::AbstractVector, rng = Random.GLOBAL_RNG)
     if noise_step == 0
         return img
     end
