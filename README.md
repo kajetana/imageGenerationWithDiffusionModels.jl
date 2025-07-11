@@ -44,6 +44,8 @@ Get acknowledged with our
 
 to see some use cases including visualization of the noising process as well as training of the diffusion model.
 
+Larger pre-trained model can be accessed here, replace it with current examples/model.bson: https://drive.google.com/drive/folders/1cL-ZlGzCGJ8lYINLyfVwRAx8p6VA8Ygy?usp=sharing
+
 ## References
 
 > "Image generation with MNIST" Article by Lior Sinai (https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html#load-data)
