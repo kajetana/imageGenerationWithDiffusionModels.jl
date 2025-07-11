@@ -1,6 +1,6 @@
 # Getting Started Guide
 
-Clone the repository with its contents
+Clone the repository with its contents 
 
 _Terminal:_
 ```
@@ -18,7 +18,7 @@ julia>]
 (imageGenerationWithDiffusio...) pkg> instantiate
 ```
 
-Inside the `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the later parts of this guide:
+Inside the `example` folder you will find 2 executable use case scenarios, which are explained more in depth in the later parts of this guide: 
 
 ```
 example/
@@ -34,6 +34,9 @@ as well as our base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/
 ├── SyntheticImages500.mat                      digit dataset
 └── model.bson                                  pre-trained model
 ```
+
+Due to size restrictions on github, the pretrained model is accessible here: https://drive.google.com/drive/folders/1cL-ZlGzCGJ8lYINLyfVwRAx8p6VA8Ygy
+Place the 'model.bson' under the 'example' folder if it does not exist. 
 
 ### Visualizing the Noising Process
 
