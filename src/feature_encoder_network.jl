@@ -49,53 +49,69 @@ This function adds a level to the UNet through the use of the ConditionalSkipCon
 The skipped layers are defined recursively until the intended level-count of the UNet has been reached.
 When the break condition is reached, the middle of the Unet is created
 """
-function _add_unet_level(in_out::Vector{Tuple{Int,Int}}, emb_dim::Int, level::Int;
-    block_layer, num_blocks_per_level::Int
-)
-    if level > length(in_out) # stop recursion and make the middle
-        in_ch, out_ch = in_out[end]
-        keys_ = (Symbol("downsample_$level"), :middle, Symbol("upsample_$level"))
-        layers = (
-            Downsample(),
-            block_layer(out_ch => 2*out_ch, emb_dim),
-            Upsampling(2*out_ch => out_ch)
-        )
-    else # recurse down a layer
-        #in_ch_prev, out_ch_prev = in_out[level-1]
-        in_ch, out_ch = in_out[level]
-        down_keys = num_blocks_per_level == 1 ? [Symbol("down_$(level)")] : [Symbol("down_$(level)_$(i)") for i in 1:num_blocks_per_level]
-        up_keys = num_blocks_per_level == 1 ? [Symbol("up_$(level)")] : [Symbol("up_$(level)_$(i)") for i in 1:num_blocks_per_level]
-        keys_ = (
-            Symbol("downsample_$(level-1)"),
-            down_keys...,
-            Symbol("skip_$level"),
-            up_keys...,
-            Symbol("upsample_$level")
-        )
-        down_blocks = [
-            block_layer(in_ch => out_ch, emb_dim) for i in 1:num_blocks_per_level
-        ]
-        up_blocks = [
-            block_layer((out_ch + out_ch) => out_ch, emb_dim),
-            [block_layer(out_ch => out_ch, emb_dim) for i in 2:num_blocks_per_level]...
-        ]
-        layers = (
-            Downsample(),
-            down_blocks...,
-            ConditionalSkipConnection(
-                _add_unet_level(in_out, emb_dim, level + 1;
-                    block_layer=block_layer,
-                    num_blocks_per_level=num_blocks_per_level
-                ),
-                cat_on_channel_dim
-            ),
-            up_blocks...,
-            Upsampling(out_ch => in_ch),
-        )
-    end
-    ConditionalChain((; zip(keys_, layers)...))
-end
+function _add_unet_level(in_out::Vector{Tuple{Int,Int}},
+                         emb_dim::Int,
+                         level::Int;
+                         block_layer,
+                         num_blocks_per_level::Int)
 
+    if level > length(in_out) # stop recursion and make the middle (bottleneck)
+        Cin, Cout = in_out[end]
+
+        keys   = (Symbol("downsample_$level"), :middle, Symbol("upsample_$level"))
+        layers = (
+            Downsample(),
+            block_layer(Cout => 2Cout, emb_dim),   # middle “bottleneck”
+            Upsampling(2Cout => Cout),
+        )
+        return ConditionalChain((; zip(keys, layers)...))
+    end
+
+    # recurse down a layer
+    in_ch, out_ch = in_out[level]
+
+    down_keys = num_blocks_per_level == 1 ?
+                [Symbol("down_$level")] :
+                [Symbol("down_$(level)_$i") for i in 1:num_blocks_per_level]
+
+    up_keys = num_blocks_per_level == 1 ?
+              [Symbol("up_$level")] :
+              [Symbol("up_$(level)_$i") for i in 1:num_blocks_per_level]
+
+    keys = (
+        Symbol("downsample_$(level-1)"),     # comes from upper level
+        down_keys...,                        
+        Symbol("skip_$level"),              
+        up_keys...,                          # decoder blocks
+        Symbol("upsample_$level"),          
+    )
+
+    down_blocks = [
+        block_layer(in_ch => out_ch, emb_dim)            # first block changes depth
+        [block_layer(out_ch => out_ch, emb_dim) for _ in 2:num_blocks_per_level]...
+    ]
+
+    cat_depth   = 2out_ch                      
+    up_blocks = [
+        block_layer(cat_depth => out_ch, emb_dim),
+        [block_layer(out_ch => out_ch, emb_dim) for _ in 2:num_blocks_per_level]...
+    ]
+
+    inner = _add_unet_level(in_out, emb_dim, level + 1;
+                            block_layer = block_layer,
+                            num_blocks_per_level = num_blocks_per_level)
+
+
+    layers = (
+        Downsample(),
+        down_blocks...,
+        ConditionalSkipConnection(inner, cat_on_channel_dim),
+        up_blocks...,
+        Upsampling(out_ch => in_ch),
+    )
+
+    ConditionalChain((; zip(keys, layers)...))
+end
 
 export make_down_path, _add_unet_level, cat_on_channel_dim
 end 

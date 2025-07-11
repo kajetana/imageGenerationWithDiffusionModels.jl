@@ -4,6 +4,7 @@ import Flux: gelu
 
 # Resblock: https://liorsinai.github.io/machine-learning/2022/12/29/denoising-diffusion-2-unet.html
 # 3×3 → 3×3 Residual block with time conditioning
+
 abstract type AbstractParallel end
 """
     struct TResBlock<: AbstractParallel
@@ -13,49 +14,44 @@ struct TResBlock<: AbstractParallel
     conv1::Conv         # 3x3
     conv2::Conv         # 3×3
     skip::Any           # identity or 1×1 conv
-    emb_proj::Dense     # emb_dim → out_channel
+    gn1::Flux.GroupNorm         
+    gn2::Flux.GroupNorm   
+    emb_proj::Dense     # emb_dim → out_channel       
 end
 Flux.Flux.@functor TResBlock
 """
     TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
 Constructs a `TResBlock` with in- and output `channels`.
+
 """
+#Usage of GroupNorm from ChatGPT
+#Q: How can I normalize feature maps in my diffusion model's residual block to improve training stability?
 function TResBlock(channels::Pair{<:Integer,<:Integer}, emb_dim::Int)
+   # Cin, Cout = channels
+    G = min(32, channels[2])
     TResBlock(
         Conv((3,3), channels; pad = 1),
         Conv((3,3), channels[2]=>channels[2]; pad = 1),
         channels[1] == channels[2] ? identity : Conv((1,1), channels),
+        Flux.GroupNorm(channels[2], G),
+        Flux.GroupNorm(channels[2], G),        
         Dense(emb_dim, channels[2])
     )
 end
-"""
-    (m::TResBlock)(x, t_emb)
-Forward pass for the `TResBlock`.
-A `SkipConnection` skips over two convolution layers. `x` is the layer input and t_emb in added to the feature maps as a bias after the first convolution.
-See also `Flux.SkipConnection`, `Flux.Conv`
-"""
-"""
-function (m::TResBlock)(x, t_emb)
-    #@info "Feature shape before failing conv: ", size(x)
-    h = gelu.(m.conv1(x))
-    # broadcast time embedding to (1,1,C,B) and add
-    h = h .+ reshape(m.emb_proj(t_emb), 1,1,size(h,3),size(h,4))
-    h  = gelu.(m.conv2(h))
-    return h .+ (m.skip === identity ? x : m.skip(x))
-end
-"""
+
 
 function (m::TResBlock)(x, t_emb)
     #@info "Feature shape before failing conv: ", size(x)
+    #first conv + norm + activation
     h = m.conv1(x)
-    h = Flux.GroupNorm(8, size(h, 3))(h)  # group norm after conv1
+    h = m.gn1(h)  # group norm after conv1
     h = gelu.(h)
     # broadcast time embedding to (1,1,C,B) and add
 
     h = h .+ reshape(m.emb_proj(t_emb), 1, 1, size(h, 3), size(h, 4))
 
     h = m.conv2(h)
-    h = Flux.GroupNorm(8, size(h, 3))(h)  # group norm after conv2
+    h = m.gn2(h)   # group norm after conv2
     h = gelu.(h)
 
     return h .+ (m.skip === identity ? x : m.skip(x))
