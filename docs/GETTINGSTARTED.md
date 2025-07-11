@@ -36,6 +36,7 @@ as well as our base dataset [(source)](https://webhomes.maths.ed.ac.uk/~dhigham/
 ```
 
 Due to size restrictions on github, the pretrained model is accessible here: https://drive.google.com/drive/folders/1cL-ZlGzCGJ8lYINLyfVwRAx8p6VA8Ygy
+
 Place the 'model.bson' under the 'example' folder if it does not exist. 
 
 ### Visualizing the Noising Process
