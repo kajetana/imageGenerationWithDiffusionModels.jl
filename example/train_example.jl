@@ -6,32 +6,31 @@ using FileIO, PNGFiles
 using Images
 using BSON: @load
 
-# Training
-
-num_timesteps = 100 # for recreating alpha bar in terms of reverese sampling
-
+num_timesteps = 100
 training = false
 
 if training
     model = train(num_timesteps=num_timesteps)
+elseif isfile("example/model.bson")
+    @load "example/model.bson" model
+
+    # Reverse Sampling
+    beta = cosine_beta_schedule(num_timesteps)
+    alphaBar = cumprod(1 .- beta)
+
+    img = ReverseSampling.reverse_sample(model,
+                                         (32, 32, 1, 1);
+                                         T = num_timesteps,
+                                         alpha_hats = alphaBar)
+
+    img = reshape(img, 32, 32)
+    img = (img .- minimum(img)) ./ (maximum(img) - minimum(img))
+    img = RGB.(img, img, img)
+
+    save("reverse_sample.png", img)
+    println("Image generated and saved!")
 else
-    @load "./example/model.bson" model
+    println("Model file is not uploaded to github due to size restrictions. Please upload it from:")
+    println("https://drive.google.com/drive/folders/1cL-ZlGzCGJ8lYINLyfVwRAx8p6VA8Ygy")
 end
 
-# Reverse Sampling
-
-beta = cosine_beta_schedule(num_timesteps)
-alphaBar = cumprod(1 .- beta)
-
-#sample one greyscale image with the UNet
-img = ReverseSampling.reverse_sample(model,
-                                   (32,32,1,1);     
-                                   T = num_timesteps,
-                                   alpha_hats = alphaBar)
-
-img = reshape(img, 32, 32) # remove additional batch dimensions
-img = (img .- minimum(img)) ./ (maximum(img) - minimum(img)) # now in [0,1]
-img = RGB.(img, img, img) # 32×32 Array{RGB}
-
-save("reverse_sample.png", img)
-println("Image generated and saved!")
