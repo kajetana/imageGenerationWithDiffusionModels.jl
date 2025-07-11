@@ -11,7 +11,7 @@ img0 = images[:, :, 1, 1]
 gui = ImageView.imshow(img0)
 
 # Noise schedule
-timesteps = 1:10
+timesteps = 1:100
 num_timesteps = length(timesteps)
 beta_schedule  = collect(LinRange(1e-4, 0.02, num_timesteps))
 alphas = 1 .- beta_schedule
@@ -30,7 +30,7 @@ for t in timesteps
         noised2d, noise2d = imageGenerationWithDiffusionModels.add_noise_to_image(
             Float32.(noisy_images[t-1]),  # Ensure img0 is Float32
             t,
-            alpha_hats
+            alphas
         )
         push!(noisy_images, noised2d)
         push!(noises, noise2d)
@@ -46,7 +46,7 @@ noises
 # Define the required arguments
 model = identity  
 shape = (32, 32)  
-T = timesteps[end]  # Use the last timestep
+T = timesteps[end] 
 noisy_image = noisy_images[end]   
 istest = true  
 

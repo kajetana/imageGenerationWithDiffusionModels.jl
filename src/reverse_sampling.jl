@@ -16,7 +16,7 @@ function reverse_sample(model, shape::NTuple{2,Int};T::Int,
         x_t = noisy_image
     end
 
-    for t in T:-1:1
+    for t in T-1:-1:1
 
 
         if istest
@@ -31,12 +31,14 @@ function reverse_sample(model, shape::NTuple{2,Int};T::Int,
 
         coef1 = 1 / sqrt(α)
         coef2 = β / sqrt(1 - α_hat)
-        mean = coef1 * (x_t - coef2 * eps_pred)
+        #mean = coef1 * (x_t - coef2 * eps_pred)
+
+        mean = (x_t - sqrt(1 - α) * eps_pred) / sqrt(α)
 
         if t > 1
             σ = sqrt(β)
             noise = randn(Float32, shape)
-             x_t = mean .+ σ .* noise
+            x_t = mean .+ σ .* noise
         else
             x_t = mean
         end
